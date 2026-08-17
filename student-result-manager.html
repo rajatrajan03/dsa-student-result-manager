@@ -1,0 +1,2167 @@
+<meta charset="utf-8">
+<title>Student Result Manager — DSA Visualizer</title>
+<style>
+  :root {
+    --bg: #f2f3f5;
+    --bg-edge: #e4e6ea;
+    --surface: rgba(255,255,255,0.55);
+    --surface-2: rgba(255,255,255,0.35);
+    --border: rgba(20,22,28,0.09);
+    --text: #16181d;
+    --text-muted: #565c68;
+    --text-faint: #7d8390;
+    --accent: #2563eb;
+    --accent-soft: rgba(37,99,235,0.12);
+    --gold: #a3720a;
+    --gold-soft: rgba(184,134,11,0.14);
+    --danger: #c53030;
+    --danger-soft: rgba(207,61,61,0.13);
+    --violet: #6d28d9;
+    --violet-soft: rgba(124,58,237,0.13);
+    --shadow: 0 8px 28px -10px rgba(20,22,28,0.18), inset 0 1px 0 rgba(255,255,255,0.5);
+    --glass-blur: blur(16px) saturate(140%);
+    --radius: 14px;
+    --mono: ui-monospace, 'Cascadia Code', 'JetBrains Mono', Consolas, monospace;
+    --sans: -apple-system, 'Segoe UI', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0a0b0e;
+      --bg-edge: #111318;
+      --surface: rgba(255,255,255,0.045); --surface-2: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.09);
+      --text: #eceef2; --text-muted: #9599a3; --text-faint: #676c78;
+      --accent: #6f9bff; --accent-soft: rgba(111,155,255,0.13);
+      --gold: #dcae4a; --gold-soft: rgba(220,174,74,0.14);
+      --danger: #e8746b; --danger-soft: rgba(232,116,107,0.13);
+      --violet: #a98cf0; --violet-soft: rgba(169,140,240,0.13);
+      --shadow: 0 8px 28px -10px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0b0e;
+    --bg-edge: #111318;
+    --surface: rgba(255,255,255,0.045); --surface-2: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.09);
+    --text: #eceef2; --text-muted: #9599a3; --text-faint: #676c78;
+    --accent: #6f9bff; --accent-soft: rgba(111,155,255,0.13);
+    --gold: #dcae4a; --gold-soft: rgba(220,174,74,0.14);
+    --danger: #e8746b; --danger-soft: rgba(232,116,107,0.13);
+    --violet: #a98cf0; --violet-soft: rgba(169,140,240,0.13);
+    --shadow: 0 8px 28px -10px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body {
+    margin: 0; color: var(--text);
+    font-family: var(--sans); padding: 32px 20px 60px;
+    display: flex; justify-content: center;
+    position: relative; isolation: isolate;
+    background: var(--bg);
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: -1;
+    background: radial-gradient(120vmax 80vmax at 50% -10%, var(--bg-edge), var(--bg) 60%);
+  }
+  .page { width: 100%; max-width: 860px; }
+
+  /* --- the one big glass shell everything else lives inside --- */
+  .shell {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 22px; box-shadow: var(--shadow);
+    backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+    padding: 30px 28px 26px; position: relative;
+  }
+  .shell::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 30%);
+  }
+
+  header { margin-bottom: 20px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 8px;
+  }
+  h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+  .sub { color: var(--text-muted); font-size: 15px; line-height: 1.55; max-width: 66ch; margin: 0; }
+  .title-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tour-btn {
+    font-family: var(--sans); font-size: 12.5px; font-weight: 700;
+    background: color-mix(in srgb, var(--accent) 80%, transparent); color: #fff;
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    border-radius: 999px; padding: 7px 14px; cursor: pointer; white-space: nowrap;
+    box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--accent) 60%, transparent);
+    animation: tourPulse 2.4s ease-in-out infinite;
+  }
+  .tour-btn:hover { opacity: 0.92; }
+  .tour-btn:disabled { opacity: 0.4; cursor: not-allowed; animation: none; }
+  @keyframes tourPulse { 0%, 100% { box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--accent) 60%, transparent); } 50% { box-shadow: 0 4px 20px -4px color-mix(in srgb, var(--accent) 85%, transparent); } }
+
+  .tour-banner {
+    display: none; align-items: center; gap: 10px; margin-bottom: 16px;
+    padding: 11px 16px; border-radius: var(--radius); background: var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+    position: sticky; top: 12px; z-index: 30; box-shadow: var(--shadow);
+  }
+  .tour-banner.active { display: flex; }
+  .tour-banner-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: 0 0 auto;
+    animation: tourDot 1.1s ease-in-out infinite;
+  }
+  @keyframes tourDot { 0%, 100% { opacity: 0.35; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.15); } }
+  .tour-banner-text { font-size: 13.5px; color: var(--text); flex: 1 1 auto; line-height: 1.5; }
+  .tour-stop-btn {
+    font-family: var(--sans); font-size: 12px; font-weight: 600; background: var(--surface-2); color: var(--text-muted);
+    border: 1px solid var(--border); border-radius: 6px; padding: 6px 11px; cursor: pointer; flex: 0 0 auto;
+  }
+  .tour-stop-btn:hover { color: var(--danger); border-color: var(--danger); }
+
+  .panel {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+  }
+  .panel-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); margin: 0 0 6px; }
+  .panel-hint { font-family: var(--mono); font-size: 11.5px; color: var(--text-faint); line-height: 1.6; margin: 0 0 14px; }
+
+  /* --- tab navigation --- */
+  .tabs {
+    display: flex; gap: 4px; overflow-x: auto; margin-bottom: 20px;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 5px;
+    backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  }
+  .tab-btn {
+    font-family: var(--sans); font-size: 13.5px; font-weight: 600; color: var(--text-muted);
+    background: transparent; border: 1px solid transparent; border-radius: 7px; padding: 9px 14px;
+    cursor: pointer; white-space: nowrap; flex: 0 0 auto; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .tab-btn:hover { background: var(--surface-2); color: var(--text); }
+  .tab-btn.active { background: color-mix(in srgb, var(--accent) 70%, transparent); color: #fff; border-color: rgba(255,255,255,0.35); box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--accent) 60%, transparent); }
+  .tab-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeIn 0.25s ease; }
+  .lab-panel { display: none; }
+  .lab-panel.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* --- shared glass treatment for every translucent surface in the app --- */
+  input, button, .row, .cell, .qcell, .stack-frame, .snake-stage, .sq-stack-well, .sq-queue-well,
+  .stat, .snake-node, .sq-chip, .snake-algo-btn, .grade-bar-row .gtrack, .del-btn, .grade-badge {
+    backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  }
+
+  .add-panel { padding: 18px 20px; margin-bottom: 20px; display: grid; grid-template-columns: 2fr 1fr auto; gap: 12px; align-items: end; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
+  input { font-family: var(--sans); font-size: 15px; padding: 9px 10px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); width: 100%; }
+  input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button {
+    font-family: var(--sans); font-size: 14px; font-weight: 600;
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    border-radius: 7px; padding: 10px 16px; cursor: pointer; transition: opacity 0.15s ease, transform 0.1s ease, background 0.15s ease;
+    background: color-mix(in srgb, var(--accent) 80%, transparent); color: #fff;
+    box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--accent) 60%, transparent), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  button:hover { opacity: 0.92; } button:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .search-panel { padding: 14px 20px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; }
+  .search-panel input { flex: 1; }
+  .btn-ghost { background: var(--surface-2); color: var(--text); border-color: var(--border); }
+  #searchResult { font-family: var(--mono); font-size: 13px; color: var(--text-muted); min-height: 18px; margin-top: 8px; }
+  #searchResult.found { color: var(--accent); }
+  #searchResult.notfound { color: var(--danger); }
+
+  .stats { display: flex; gap: 14px; margin-bottom: 20px; }
+  .stat { flex: 1; padding: 16px 18px; }
+  .stat .label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 6px; }
+  .stat .value { font-size: 22px; font-weight: 700; }
+  .stat.topper .value { color: var(--gold); }
+
+  .board-panel { padding: 20px; margin-bottom: 20px; }
+  .rows {
+    display: flex; flex-direction: column; gap: 8px;
+    max-height: 424px; overflow-y: auto; padding-right: 6px; margin-right: -6px;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  }
+  .rows::-webkit-scrollbar { width: 8px; }
+  .rows::-webkit-scrollbar-track { background: transparent; }
+  .rows::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .rows::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+  .row {
+    display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 14px;
+    padding: 12px 14px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border);
+    transition: transform 0.4s cubic-bezier(.2,.8,.2,1), background 0.3s ease, border-color 0.3s ease;
+  }
+  .row.rank1 { background: var(--gold-soft); border-color: var(--gold); }
+  .row .rank { font-family: var(--mono); font-size: 13px; color: var(--text-faint); text-align: center; }
+  .row.rank1 .rank { color: var(--gold); font-weight: 700; }
+  .row .mid { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .row .name { font-size: 15px; font-weight: 600; }
+  .row .bar-track { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; }
+  .row .bar-fill { height: 100%; border-radius: 3px; background: var(--accent); transition: width 0.6s cubic-bezier(.2,.8,.2,1); }
+  .row.rank1 .bar-fill { background: var(--gold); }
+  .row .marks { font-family: var(--mono); font-size: 16px; font-weight: 600; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+  .row.rank1 .marks { color: var(--gold); }
+  .row.new { animation: dropIn 0.5s ease; }
+  @keyframes dropIn { 0% { transform: translateY(-10px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+  .empty-msg { font-family: var(--mono); font-size: 13px; color: var(--text-faint); padding: 8px 2px; }
+  .del-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--text-faint);
+    width: 26px; height: 26px; padding: 0; border-radius: 6px; font-size: 15px; line-height: 1;
+  }
+  .del-btn:hover { background: var(--danger-soft); border-color: var(--danger); color: var(--danger); opacity: 1; }
+
+  .grade-badge {
+    font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
+    padding: 2px 7px; border-radius: 5px; border: 1px solid transparent;
+  }
+  .grade-badge.g-A { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .grade-badge.g-B { background: var(--gold-soft); color: var(--gold); border-color: var(--gold); }
+  .grade-badge.g-C { background: var(--surface-2); color: var(--text-muted); border-color: var(--border); }
+  .grade-badge.g-D { background: var(--danger-soft); color: var(--danger); border-color: var(--danger); opacity: 0.75; }
+  .grade-badge.g-F { background: var(--danger-soft); color: var(--danger); border-color: var(--danger); }
+
+  /* --- generic panel used by every algorithm demo --- */
+  .demo-panel { padding: 20px; margin-bottom: 20px; }
+  .demo-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .demo-row input { flex: 1; min-width: 120px; }
+  .demo-log { font-family: var(--mono); font-size: 13px; color: var(--text-muted); line-height: 1.7; min-height: 20px; }
+  .demo-log .ok, .demo-log .done { color: var(--accent); }
+  .demo-log .hit-gold { color: var(--gold); }
+  .demo-log .no { color: var(--danger); }
+
+  /* --- unified cell grid used by sorting / searching / pattern visualizations --- */
+  .cellgrid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; min-height: 62px; }
+  .cell {
+    font-family: var(--mono); font-size: 13px; border: 1px solid var(--border); background: var(--surface-2);
+    border-radius: 7px; padding: 8px 4px; min-width: 54px; text-align: center; position: relative;
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease, opacity 0.25s ease;
+  }
+  .cell .nm { display: block; color: var(--text-faint); font-size: 10px; margin-bottom: 2px; }
+  .cell .pointer {
+    position: absolute; top: -18px; left: 0; right: 0; font-size: 10px;
+    letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint);
+  }
+  .cell-compare, .cell-checking, .cell-active { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-4px); }
+  .cell-compare .pointer, .cell-checking .pointer, .cell-active .pointer { color: var(--accent); font-weight: 700; }
+  .cell-swap { border-color: var(--danger); background: var(--danger-soft); transform: translateY(-4px) scale(1.05); }
+  .cell-settled, .cell-hit { border-color: var(--gold); background: var(--gold-soft); }
+  .cell-hit .pointer { color: var(--gold); font-weight: 700; }
+  .cell-range { background: var(--accent-soft); }
+  .cell-discarded, .cell-seen { opacity: 0.35; }
+  .cell-dup { border-color: var(--danger); background: var(--danger-soft); }
+  .cell-dup .pointer { color: var(--danger); font-weight: 700; }
+  .cell-window { border-color: var(--violet); background: var(--violet-soft); }
+  .cell-window .pointer { color: var(--violet); font-weight: 700; }
+  .cell-best { border-color: var(--gold); background: var(--gold-soft); box-shadow: 0 0 0 1px var(--gold) inset; }
+
+  /* --- queue --- */
+  .queue-row { display: flex; align-items: center; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+  .queue-end-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); flex: 0 0 auto; }
+  .qcell {
+    flex: 0 0 auto; font-family: var(--mono); font-size: 13px; font-weight: 600; padding: 8px 14px;
+    border-radius: 7px; background: var(--accent-soft); border: 1px solid var(--accent); color: var(--accent);
+    animation: dropIn 0.4s ease;
+  }
+  .qcell.front { background: var(--gold-soft); border-color: var(--gold); color: var(--gold); }
+  .queue-arrow { color: var(--text-faint); font-size: 13px; flex: 0 0 auto; }
+
+  /* --- grade distribution bars --- */
+  .grade-bars { display: flex; flex-direction: column; gap: 10px; }
+  .grade-bar-row { display: grid; grid-template-columns: 26px 1fr 30px; align-items: center; gap: 12px; }
+  .grade-bar-row .glabel { font-family: var(--mono); font-weight: 700; font-size: 13px; text-align: center; }
+  .grade-bar-row .gtrack { height: 12px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; }
+  .grade-bar-row .gfill { display: block; height: 100%; border-radius: 6px; transition: width 0.6s cubic-bezier(.2,.8,.2,1); }
+  .grade-bar-row .gcount { font-family: var(--mono); font-size: 13px; color: var(--text-muted); text-align: right; }
+
+  /* --- toolbar: undo + kth highest --- */
+  .toolbar { padding: 14px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .btn-ghost:disabled { opacity: 0.4; cursor: not-allowed; }
+  .toolbar .divider { width: 1px; align-self: stretch; background: var(--border); }
+  .toolbar .kth-group { display: flex; align-items: center; gap: 8px; }
+  .toolbar .kth-group input { width: 64px; }
+  #kthResult, #historyHint { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+
+  /* --- call stack (recursion) --- */
+  .stack-frames { display: flex; flex-direction: column-reverse; gap: 6px; margin-bottom: 10px; min-height: 40px; }
+  .stack-frame {
+    font-family: var(--mono); font-size: 12.5px; border: 1px solid var(--border); background: var(--surface-2);
+    border-radius: 7px; padding: 8px 12px; animation: frameIn 0.3s ease;
+  }
+  .stack-frame.returning { border-color: var(--gold); background: var(--gold-soft); }
+  @keyframes frameIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+
+  /* --- BST tree --- */
+  .bst-svg-wrap { overflow-x: auto; margin-bottom: 10px; }
+  .bst-node-circle { fill: var(--surface-2); stroke: var(--border); stroke-width: 1.5; transition: fill 0.3s ease, stroke 0.3s ease; }
+  .bst-node-circle.visited { fill: var(--gold-soft); stroke: var(--gold); }
+  .bst-node-text { font-family: var(--mono); font-size: 11px; fill: var(--text); text-anchor: middle; }
+  .bst-edge { stroke: var(--border); stroke-width: 1.5; }
+
+  /* --- charts --- */
+  .chart-wrap { overflow-x: auto; }
+  .chart-bar-label, .chart-axis-label { font-family: var(--mono); font-size: 10px; fill: var(--text-faint); }
+  .chart-value-label { font-family: var(--mono); font-size: 10.5px; fill: var(--text); font-weight: 600; }
+  .chart-gridline { stroke: var(--border); stroke-width: 1; }
+  .chart-line-path { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+  .chart-point { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+
+  /* --- sort snake module --- */
+  .snake-algo-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .snake-algo-btn {
+    flex: 1 1 90px; font-family: var(--sans); font-weight: 600; font-size: 12.5px;
+    background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border);
+    border-radius: 7px; padding: 8px 8px; cursor: pointer; text-align: center;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .snake-algo-btn:hover { color: var(--text); }
+  .snake-algo-btn.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .snake-algo-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .snake-infobar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .snake-badge {
+    font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+    background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 5px; padding: 3px 9px; flex: 0 0 auto;
+  }
+  .snake-desc { font-size: 12.5px; color: var(--text-muted); }
+  .snake-speed-tag {
+    font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent);
+    background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 5px; padding: 2px 7px;
+    min-width: 50px; text-align: center; display: inline-block;
+  }
+  .snake-stats { display: flex; gap: 14px; font-family: var(--mono); font-size: 11.5px; color: var(--text-muted); margin-top: 12px; }
+
+  /* --- shared speed control, shown at the top of Sorting/Searching/Structures --- */
+  .speed-bar { padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .speed-bar-label { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+  .speed-bar input[type="range"] { width: 150px; accent-color: var(--accent); }
+  .snake-stats b { color: var(--text); font-variant-numeric: tabular-nums; }
+
+  .snake-stage {
+    position: relative; margin-top: 14px; height: 300px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--surface-2); overflow: hidden;
+  }
+  .snake-stage svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .snake-spine { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0.55; }
+
+  .snake-node {
+    position: absolute; width: 52px; height: 52px; margin-left: -26px; margin-top: -26px;
+    border-radius: 50%; background: var(--surface); border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); color: var(--text);
+    box-shadow: var(--shadow);
+    transition: left 0.5s cubic-bezier(.22,.9,.32,1), top 0.5s cubic-bezier(.22,.9,.32,1),
+                border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, transform 0.25s ease;
+  }
+  .snake-node .snake-mk { font-size: 15px; font-weight: 700; }
+  .snake-node.snake-compare { border-color: var(--accent); background: var(--accent-soft); transform: scale(1.1); }
+  .snake-node.snake-swap { border-color: var(--danger); background: var(--danger-soft); transform: scale(1.14); }
+  .snake-node.snake-settled { border-color: var(--gold); background: var(--gold-soft); }
+  .snake-node.snake-pivot { border-color: var(--violet); background: var(--violet-soft); }
+
+  /* --- stack & queue lab --- */
+  .sq-stack-well {
+    min-height: 220px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2);
+    display: flex; flex-direction: column-reverse; align-items: center; gap: 6px; padding: 10px; overflow-y: auto;
+  }
+  .sq-queue-well {
+    min-height: 220px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2);
+    display: flex; align-items: center; gap: 8px; padding: 10px; overflow-x: auto;
+  }
+  .sq-chip {
+    flex: 0 0 auto; font-family: var(--mono); font-weight: 700; font-size: 14px;
+    background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 7px; padding: 8px 14px; animation: dropIn 0.3s ease;
+  }
+  .sq-chip.sq-top { background: var(--gold-soft); color: var(--gold); border-color: var(--gold); }
+  .sq-chip.sq-front { background: var(--gold-soft); color: var(--gold); border-color: var(--gold); }
+  .sq-empty { font-family: var(--mono); font-size: 12px; color: var(--text-faint); }
+
+  /* --- hashing lab --- */
+  .hash-buckets { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+  .hash-bucket { border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); padding: 10px; min-height: 90px; }
+  .hash-bucket-idx { font-family: var(--mono); font-size: 11px; color: var(--text-faint); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .hash-bucket-idx b { color: var(--text-muted); }
+  .hash-chain { display: flex; flex-direction: column; gap: 6px; }
+  .hash-item {
+    font-family: var(--mono); font-size: 12px; padding: 6px 9px; border-radius: 6px;
+    background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent);
+    animation: dropIn 0.35s ease;
+  }
+  .hash-bucket.hash-hit { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .hash-bucket.hash-collision { border-color: var(--danger); }
+  .hash-bucket.hash-collision .hash-bucket-idx { color: var(--danger); }
+
+  footer { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .footer-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); margin: 0 0 12px; }
+  .complexity-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px 14px; }
+  .complexity-chip {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 8px 10px; border-radius: 7px; background: var(--surface-2); border: 1px solid var(--border);
+    font-size: 12.5px;
+  }
+  .complexity-chip b { font-weight: 600; color: var(--text-muted); }
+  .complexity-chip em {
+    font-family: var(--mono); font-style: normal; font-weight: 700; font-size: 11.5px; color: var(--accent);
+    background: var(--accent-soft); border-radius: 5px; padding: 2px 7px; flex: 0 0 auto; white-space: nowrap;
+  }
+  .footer-note { font-size: 12.5px; color: var(--text-faint); line-height: 1.6; margin: 16px 0 0; }
+
+  @media (max-width: 560px) {
+    .add-panel { grid-template-columns: 1fr 1fr; }
+    .add-panel button { grid-column: 1 / -1; }
+    .stats { flex-direction: column; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .row, .cell, .qcell, .stack-frame, .tab-panel.active { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="page">
+ <div class="shell">
+  <header>
+    <p class="eyebrow">Data Structures &amp; Algorithms &middot; Java Project</p>
+    <div class="title-row">
+      <h1>Student Result Manager</h1>
+      <button id="tourBtn" class="tour-btn">&#9654; Guided Tour</button>
+    </div>
+    <p class="sub">A student record system where every operation — sorting, searching, undo, ranking — is a real DSA concept you can watch run, step by step. All data lives in memory, no database.</p>
+  </header>
+
+  <div class="tour-banner" id="tourBanner">
+    <span class="tour-banner-dot"></span>
+    <span class="tour-banner-text" id="tourBannerText">Starting tour…</span>
+    <button class="tour-stop-btn" id="tourStopBtn">&#9632; Stop tour</button>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="overview">Overview</button>
+    <button class="tab-btn" data-tab="sorting">Sorting</button>
+    <button class="tab-btn" data-tab="searching">Searching</button>
+    <button class="tab-btn" data-tab="structures">Structures</button>
+    <button class="tab-btn" data-tab="patterns">Patterns</button>
+    <button class="tab-btn" data-tab="snake">Learn</button>
+  </nav>
+
+  <!-- ================= OVERVIEW ================= -->
+  <section class="tab-panel active" data-tab-panel="overview">
+    <div class="panel add-panel">
+      <div class="field">
+        <label for="name">Student name</label>
+        <input type="text" id="name" placeholder="e.g. Rahul" />
+      </div>
+      <div class="field">
+        <label for="marks">Marks</label>
+        <input type="number" id="marks" placeholder="e.g. 85" min="0" max="100" />
+      </div>
+      <button id="addBtn">Add student</button>
+    </div>
+
+    <div class="panel search-panel">
+      <input type="text" id="searchInput" placeholder="Search a student by name..." />
+      <button class="btn-ghost" id="searchBtn">Search</button>
+    </div>
+    <div id="searchResult"></div>
+
+    <div class="panel toolbar" style="margin-top: 20px;">
+      <button class="btn-ghost" id="undoBtn" disabled>&#8630; Undo last action</button>
+      <span id="historyHint"></span>
+      <div class="divider"></div>
+      <div class="kth-group">
+        <label for="kthInput" style="font-family: var(--mono); font-size: 12px; color: var(--text-muted);">Rank #</label>
+        <input type="number" id="kthInput" min="1" placeholder="2" />
+        <button class="btn-ghost" id="kthBtn">Find student</button>
+      </div>
+      <span id="kthResult"></span>
+    </div>
+
+    <div class="stats">
+      <div class="panel stat topper">
+        <div class="label">Topper</div>
+        <div class="value" id="topperVal">—</div>
+      </div>
+      <div class="panel stat">
+        <div class="label">Class average</div>
+        <div class="value" id="avgVal">—</div>
+      </div>
+      <div class="panel stat">
+        <div class="label">Total students</div>
+        <div class="value" id="countVal">0</div>
+      </div>
+    </div>
+
+    <div class="panel board-panel">
+      <p class="panel-title">Ranked list — highest marks first</p>
+      <div class="rows" id="rows"></div>
+    </div>
+  </section>
+
+  <!-- ================= SORTING ================= -->
+  <section class="tab-panel" data-tab-panel="sorting">
+    <div class="panel speed-bar">
+      <span class="speed-bar-label">Animation speed</span>
+      <input type="range" id="sortSpeedSlider" min="1" max="5" value="3" step="1" />
+      <span class="snake-speed-tag" id="sortSpeedTag">Normal</span>
+    </div>
+    <div class="panel demo-panel">
+      <p class="panel-title">Bubble sort — O(n&sup2;)</p>
+      <p class="panel-hint">Compares each neighboring pair and swaps them if out of order, one pass at a time, until nothing needs swapping. No built-in sort used.</p>
+      <div class="demo-row"><button id="bubbleBtn">Run bubble sort</button></div>
+      <div class="cellgrid" id="bubbleArray"></div>
+      <div class="demo-log" id="bubbleLog"></div>
+    </div>
+
+    <div class="panel demo-panel">
+      <p class="panel-title">Selection sort — O(n&sup2;)</p>
+      <p class="panel-hint">Each pass scans the unsorted part for the minimum, then swaps it into place. Only one swap per pass — fewer swaps than bubble sort.</p>
+      <div class="demo-row"><button id="selectionBtn">Run selection sort</button></div>
+      <div class="cellgrid" id="selectionArray"></div>
+      <div class="demo-log" id="selectionLog"></div>
+    </div>
+
+    <div class="panel demo-panel">
+      <p class="panel-title">Insertion sort — O(n&sup2;)</p>
+      <p class="panel-hint">Builds the sorted portion one student at a time, shifting larger values right to make room — the way you'd sort playing cards in your hand.</p>
+      <div class="demo-row"><button id="insertionBtn">Run insertion sort</button></div>
+      <div class="cellgrid" id="insertionArray"></div>
+      <div class="demo-log" id="insertionLog"></div>
+    </div>
+
+    <div class="panel demo-panel">
+      <p class="panel-title">Merge sort — O(n log n)</p>
+      <p class="panel-hint">Divide and conquer: splits the list in half recursively down to single students, then merges pairs back together in sorted order.</p>
+      <div class="demo-row"><button id="mergeBtn">Run merge sort</button></div>
+      <div class="cellgrid" id="mergeArray"></div>
+      <div class="demo-log" id="mergeLog"></div>
+    </div>
+  </section>
+
+  <!-- ================= SEARCHING ================= -->
+  <section class="tab-panel" data-tab-panel="searching">
+    <div class="panel speed-bar">
+      <span class="speed-bar-label">Animation speed</span>
+      <input type="range" id="searchSpeedSlider" min="1" max="5" value="3" step="1" />
+      <span class="snake-speed-tag" id="searchSpeedTag">Normal</span>
+    </div>
+    <div class="panel demo-panel">
+      <p class="panel-title">Linear search — O(n)</p>
+      <p class="panel-hint">Checks every student one by one from the start until a name matches, or the list runs out. Works on unsorted data but doesn't scale well.</p>
+      <div class="demo-row">
+        <input type="text" id="linearSearchInput" placeholder="Name to find, e.g. Priya" />
+        <button id="linearSearchBtn">Linear search</button>
+      </div>
+      <div class="cellgrid" id="linearSearchArray"></div>
+      <div class="demo-log" id="linearSearchLog"></div>
+    </div>
+
+    <div class="panel demo-panel">
+      <p class="panel-title">Binary search — O(log n)</p>
+      <p class="panel-hint">Array is sorted ascending first (required for binary search), then the middle is checked and half the array is discarded each step — far fewer checks than scanning one by one.</p>
+      <div class="demo-row">
+        <input type="number" id="bsearchInput" placeholder="Marks to find, e.g. 88" />
+        <button id="bsearchBtn">Binary search</button>
+      </div>
+      <div class="cellgrid" id="barray"></div>
+      <div class="demo-log" id="bsearchLog"></div>
+    </div>
+  </section>
+
+  <!-- ================= STRUCTURES ================= -->
+  <section class="tab-panel" data-tab-panel="structures">
+    <div class="panel speed-bar">
+      <span class="speed-bar-label">Animation speed</span>
+      <input type="range" id="structSpeedSlider" min="1" max="5" value="3" step="1" />
+      <span class="snake-speed-tag" id="structSpeedTag">Normal</span>
+    </div>
+    <div class="panel demo-panel">
+      <p class="panel-title">Recent additions — queue (FIFO)</p>
+      <p class="panel-hint">Newest student joins the back. Once more than 5 are tracked, the oldest one leaves from the front — first in, first out. (Undo, in the Overview toolbar, uses a Stack — LIFO — the opposite order.)</p>
+      <div class="queue-row" id="queueRow"></div>
+    </div>
+
+    <div class="panel demo-panel">
+      <p class="panel-title">Grade distribution — HashMap frequency count</p>
+      <p class="panel-hint">Every student's grade is tallied in a hash map keyed by letter grade — one pass, O(n).</p>
+      <div class="grade-bars" id="gradeBars"></div>
+    </div>
+
+    <div class="panel demo-panel">
+      <p class="panel-title">Duplicate marks — HashSet</p>
+      <p class="panel-hint">Checks whether any two students share the exact same marks, using a HashSet's O(1) membership check instead of comparing every pair.</p>
+      <div class="demo-row"><button id="dupBtn">Check for duplicates</button></div>
+      <div class="cellgrid" id="dupArray"></div>
+      <div class="demo-log" id="dupLog"></div>
+    </div>
+
+    <div class="panel demo-panel">
+      <p class="panel-title">Binary Search Tree — insert + inorder traversal</p>
+      <p class="panel-hint">Each student is inserted keyed by marks: smaller goes left, larger goes right. Reading the tree inorder (left, node, right) visits every student in sorted order automatically.</p>
+      <div class="demo-row"><button id="bstBtn">Build tree &amp; traverse</button></div>
+      <div class="bst-svg-wrap"><svg id="bstSvg" width="100%" height="220"></svg></div>
+      <div class="demo-log" id="bstLog"></div>
+    </div>
+  </section>
+
+  <!-- ================= PATTERNS ================= -->
+  <section class="tab-panel" data-tab-panel="patterns">
+    <div class="panel demo-panel">
+      <p class="panel-title">Pair with target sum — "Two Sum" pattern</p>
+      <p class="panel-hint">Finds two students whose marks add up to a target. Instead of comparing every pair (O(n&sup2;)), each student is checked against a hash map of everyone seen so far — O(n).</p>
+      <div class="demo-row">
+        <input type="number" id="twosumInput" placeholder="Target sum, e.g. 170" />
+        <button id="twosumBtn">Find pair</button>
+      </div>
+      <div class="cellgrid" id="twosumArray"></div>
+      <div class="demo-log" id="twosumLog"></div>
+    </div>
+
+    <div class="panel demo-panel">
+      <p class="panel-title">Reverse the list — two-pointer technique</p>
+      <p class="panel-hint">One pointer starts at the front, one at the back. They swap their students and step toward the middle until they meet — O(n) time, no extra array.</p>
+      <div class="demo-row"><button id="reverseBtn">Reverse list</button></div>
+      <div class="cellgrid" id="reverseArray"></div>
+      <div class="demo-log" id="reverseLog"></div>
+    </div>
+
+    <div class="panel demo-panel">
+      <p class="panel-title">Sliding window — best-average streak</p>
+      <p class="panel-hint">Finds the run of k consecutive students (in current list order) with the highest combined average — the window slides one step at a time, adding one student and dropping another instead of re-summing from scratch. O(n).</p>
+      <div class="demo-row">
+        <input type="number" id="windowInput" placeholder="Window size k, e.g. 2" min="1" />
+        <button id="windowBtn">Slide window</button>
+      </div>
+      <div class="cellgrid" id="windowArray"></div>
+      <div class="demo-log" id="windowLog"></div>
+    </div>
+
+    <div class="panel demo-panel">
+      <p class="panel-title">Prefix sum — running average</p>
+      <p class="panel-hint">Precomputes a running total so the class average "so far" at any point is a single lookup instead of re-adding from the start. See the trend on the <b>Charts</b> tab.</p>
+      <div class="demo-row"><button id="prefixBtn">Compute prefix sums</button></div>
+      <div class="demo-log" id="prefixLog"></div>
+    </div>
+
+    <div class="panel demo-panel">
+      <p class="panel-title">Recursion — sum of marks via call stack</p>
+      <p class="panel-hint">Instead of a loop, the function calls itself on the rest of the list until it hits an empty list (the base case), then each call adds its student's marks as the stack unwinds.</p>
+      <div class="demo-row"><button id="recurBtn">Run recursive sum</button></div>
+      <div class="stack-frames" id="stackFrames"></div>
+      <div class="demo-log" id="recurLog"></div>
+    </div>
+  </section>
+
+
+  <!-- ================= LEARN: SORTING LAB ================= -->
+  <section class="tab-panel" data-tab-panel="snake">
+    <div class="panel demo-panel" style="margin-bottom: 16px;">
+      <p class="panel-title">Learning labs</p>
+      <p class="panel-hint" style="margin-bottom: 14px;">Standalone practice sets, independent of your class list — pick a topic below. Nothing here touches real data.</p>
+      <div class="snake-algo-tabs" id="labTabs">
+        <button class="snake-algo-btn active" data-lab="sorting">Sorting</button>
+        <button class="snake-algo-btn" data-lab="searching">Searching</button>
+        <button class="snake-algo-btn" data-lab="stackqueue">Stack &amp; Queue</button>
+        <button class="snake-algo-btn" data-lab="recursion">Recursion</button>
+        <button class="snake-algo-btn" data-lab="hashing">Hashing</button>
+      </div>
+    </div>
+
+    <div class="lab-panel active" data-lab-panel="sorting">
+    <div class="panel demo-panel snake-panel">
+      <p class="panel-title">Sorting lab — six algorithms, one connected chain</p>
+      <p class="panel-hint">Its own random values on their own connected chain. Pick an algorithm and watch the whole chain slither into sorted order, node by node. Great for learning how each algorithm behaves before you trust it on real data.</p>
+
+      <div class="demo-row" style="margin-bottom: 0;">
+        <span style="font-family: var(--mono); font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:8px;">
+          Values: <input type="range" id="snakeSizeSlider" min="5" max="16" value="10" step="1" style="width:120px;" />
+          <span class="snake-speed-tag" id="snakeSizeTag">10</span>
+        </span>
+      </div>
+
+      <div class="snake-algo-tabs" id="snakeAlgoTabs">
+        <button class="snake-algo-btn active" data-algo="bubble">Bubble</button>
+        <button class="snake-algo-btn" data-algo="selection">Selection</button>
+        <button class="snake-algo-btn" data-algo="insertion">Insertion</button>
+        <button class="snake-algo-btn" data-algo="merge">Merge</button>
+        <button class="snake-algo-btn" data-algo="quick">Quick</button>
+        <button class="snake-algo-btn" data-algo="heap">Heap</button>
+      </div>
+
+      <div class="snake-infobar">
+        <span class="snake-badge" id="snakeAlgoBadge">BUBBLE</span>
+        <span class="snake-desc" id="snakeAlgoDesc">Repeatedly swaps neighboring values that are out of order until the row settles. (O(n&sup2;))</span>
+      </div>
+
+      <div class="demo-row" style="margin-top: 12px; align-items: center;">
+        <button id="snakePlayBtn">&#9654; Play</button>
+        <button class="btn-ghost" id="snakePauseBtn" disabled>&#10073;&#10073; Pause</button>
+        <button class="btn-ghost" id="snakeStopBtn" disabled>&#9632; Stop</button>
+        <span style="font-family: var(--mono); font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:8px;">
+          Spd: <input type="range" id="snakeSpeedSlider" min="1" max="5" value="3" step="1" style="width:120px;" />
+          <span class="snake-speed-tag" id="snakeSpeedTag">Normal</span>
+        </span>
+        <button class="btn-ghost" id="snakeShuffleBtn" style="margin-left:auto;">&#8635; New random values</button>
+      </div>
+
+      <div class="snake-stats">
+        <span>COMPARISONS: <b id="snakeCompCount">0</b></span>
+        <span>SWAPS: <b id="snakeSwapCount">0</b></span>
+        <span>STEP: <b id="snakeStepCount">0</b></span>
+      </div>
+
+      <div class="demo-log" id="snakeStatusLine" style="margin: 10px 0 4px;">Pick an algorithm, then press Play.</div>
+
+      <div class="snake-stage" id="snakeStage">
+        <svg id="snakeSpineSvg"><polyline class="snake-spine" id="snakeSpinePath" points=""/></svg>
+      </div>
+      <p class="panel-hint" style="margin: 10px 0 0;">This is a self-contained practice set — it has no connection to your class list and doesn't change any real data.</p>
+    </div>
+    </div>
+
+    <div class="lab-panel" data-lab-panel="searching">
+    <div class="panel demo-panel snake-panel">
+      <p class="panel-title">Searching lab — linear vs. binary</p>
+      <p class="panel-hint">A sorted, independent set of values. Run linear search (checks one by one) or binary search (halves the range each step) for the same target and compare how many checks each one takes.</p>
+
+      <div class="demo-row" style="margin-bottom: 0;">
+        <input type="number" id="searchLabTarget" placeholder="Value to find" style="max-width: 160px;" />
+        <button id="searchLabLinearBtn">Run linear search</button>
+        <button id="searchLabBinaryBtn">Run binary search</button>
+        <button class="btn-ghost" id="searchLabShuffleBtn" style="margin-left:auto;">&#8635; New values</button>
+      </div>
+
+      <div class="snake-stats">
+        <span>CHECKS: <b id="searchLabChecks">0</b></span>
+      </div>
+
+      <div class="demo-log" id="searchLabStatus" style="margin: 10px 0 4px;">Pick a value, then run a search.</div>
+
+      <div class="cellgrid" id="searchLabArray" style="margin-top: 14px;"></div>
+    </div>
+    </div>
+
+    <div class="lab-panel" data-lab-panel="stackqueue">
+    <div class="panel demo-panel snake-panel">
+      <p class="panel-title">Stack &amp; Queue lab — LIFO vs. FIFO, side by side</p>
+      <p class="panel-hint">A Stack only lets you add/remove from the top (Last In, First Out). A Queue only lets you add at the back and remove from the front (First In, First Out). Push and enqueue the same numbers here and see the order they come back out in.</p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div>
+          <p class="panel-title" style="margin-bottom: 8px;">Stack (LIFO)</p>
+          <div class="demo-row" style="margin-bottom: 10px;">
+            <button id="stackPushBtn">&#8593; Push</button>
+            <button class="btn-ghost" id="stackPopBtn">&#8595; Pop</button>
+          </div>
+          <div class="sq-stack-well" id="stackWell"></div>
+        </div>
+        <div>
+          <p class="panel-title" style="margin-bottom: 8px;">Queue (FIFO)</p>
+          <div class="demo-row" style="margin-bottom: 10px;">
+            <button id="queuePushBtn">&#8594; Enqueue</button>
+            <button class="btn-ghost" id="queuePopBtn">&#8592; Dequeue</button>
+          </div>
+          <div class="sq-queue-well" id="queueWell"></div>
+        </div>
+      </div>
+      <div class="demo-log" id="sqStatus" style="margin-top: 12px;">Push/enqueue a few values, then pop/dequeue to see the order.</div>
+    </div>
+    </div>
+
+    <div class="lab-panel" data-lab-panel="recursion">
+    <div class="panel demo-panel snake-panel">
+      <p class="panel-title">Recursion lab — factorial via the call stack</p>
+      <p class="panel-hint">factorial(n) calls factorial(n&minus;1) until it hits the base case factorial(0)=1, then each call multiplies as it returns. Watch the call stack grow going down and unwind coming back up.</p>
+
+      <div class="demo-row" style="margin-bottom: 0;">
+        <input type="number" id="recurLabInput" placeholder="n, e.g. 5" min="0" max="10" style="max-width: 140px;" />
+        <button id="recurLabBtn">Run factorial(n)</button>
+      </div>
+
+      <div class="demo-log" id="recurLabStatus" style="margin: 12px 0 8px;">Pick a value from 0&ndash;10, then run it.</div>
+      <div class="stack-frames" id="recurLabFrames"></div>
+    </div>
+    </div>
+
+    <div class="lab-panel" data-lab-panel="hashing">
+    <div class="panel demo-panel snake-panel">
+      <p class="panel-title">Hashing lab — how a hash map finds a bucket</p>
+      <p class="panel-hint">Type any word. Its letters are added up into a number, then reduced with <code>% 7</code> to pick one of 7 buckets — instant placement, no scanning. Two different words landing in the same bucket is a <b>collision</b>; the bucket just chains them together in a list.</p>
+
+      <div class="demo-row">
+        <input type="text" id="hashLabInput" placeholder="Word to insert, e.g. apple" />
+        <button id="hashLabBtn">Insert</button>
+        <button class="btn-ghost" id="hashLabResetBtn">&#8635; Clear table</button>
+      </div>
+
+      <div class="demo-log" id="hashLabLog" style="margin: 10px 0 14px;">Type a word and insert it to see which bucket it lands in.</div>
+
+      <div class="hash-buckets" id="hashBuckets"></div>
+    </div>
+    </div>
+  </section>
+
+  <footer>
+    <p class="footer-title">Complexity at a glance</p>
+    <div class="complexity-grid">
+      <span class="complexity-chip"><b>Sort (built-in)</b><em>O(n log n)</em></span>
+      <span class="complexity-chip"><b>Bubble / Selection / Insertion</b><em>O(n&sup2;)</em></span>
+      <span class="complexity-chip"><b>Merge sort</b><em>O(n log n)</em></span>
+      <span class="complexity-chip"><b>Linear search</b><em>O(n)</em></span>
+      <span class="complexity-chip"><b>Binary search</b><em>O(log n)</em></span>
+      <span class="complexity-chip"><b>Delete</b><em>O(n)</em></span>
+      <span class="complexity-chip"><b>Undo (Stack, LIFO)</b><em>O(1)</em></span>
+      <span class="complexity-chip"><b>Recent additions (Queue, FIFO)</b><em>O(1)</em></span>
+      <span class="complexity-chip"><b>Kth highest</b><em>O(n log n)</em></span>
+      <span class="complexity-chip"><b>Grading</b><em>O(1)</em></span>
+      <span class="complexity-chip"><b>Grade distribution / duplicates</b><em>O(n)</em></span>
+      <span class="complexity-chip"><b>Pair with target sum</b><em>O(n)</em></span>
+      <span class="complexity-chip"><b>Reverse (two pointers)</b><em>O(n)</em></span>
+      <span class="complexity-chip"><b>Sliding window / prefix sum</b><em>O(n)</em></span>
+      <span class="complexity-chip"><b>Recursion (call depth)</b><em>O(n)</em></span>
+      <span class="complexity-chip"><b>BST insert / traverse</b><em>O(n log n) avg</em></span>
+    </div>
+    <p class="footer-note">All data lives in an in-memory array — nothing is saved after you leave the page.</p>
+  </footer>
+ </div>
+</div>
+
+<script>
+(function () {
+  let students = [];
+  let lastAddedName = null;
+  const history = []; // undo stack (LIFO) — each entry knows how to reverse itself
+
+  // shared animation speed — one control, used by every sleep() call across the whole app
+  let globalSpeedFactor = 1;
+  const SPEED_FACTORS = { 1: 1.8, 2: 1.35, 3: 1, 4: 0.6, 5: 0.3 };
+  const SPEED_LABELS = { 1: 'Slowest', 2: 'Slow', 3: 'Normal', 4: 'Fast', 5: 'Fastest' };
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms * globalSpeedFactor)); }
+
+  function wireSpeedSlider(id, tagId) {
+    const slider = document.getElementById(id), tag = document.getElementById(tagId);
+    if (!slider) return null;
+    slider.addEventListener('input', () => {
+      globalSpeedFactor = SPEED_FACTORS[slider.value];
+      tag.textContent = SPEED_LABELS[slider.value];
+      syncSpeedSliders(slider.value);
+    });
+    return slider;
+  }
+  const speedSliderIds = [['sortSpeedSlider', 'sortSpeedTag'], ['searchSpeedSlider', 'searchSpeedTag'], ['structSpeedSlider', 'structSpeedTag']];
+  function syncSpeedSliders(value) {
+    speedSliderIds.forEach(([sId, tId]) => {
+      const s = document.getElementById(sId), t = document.getElementById(tId);
+      if (s) s.value = value;
+      if (t) t.textContent = SPEED_LABELS[value];
+    });
+  }
+  speedSliderIds.forEach(([sId, tId]) => wireSpeedSlider(sId, tId));
+
+  // ---------- tabs ----------
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabPanels = document.querySelectorAll('.tab-panel');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabPanels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelector('.tab-panel[data-tab-panel="' + btn.dataset.tab + '"]').classList.add('active');
+      if (btn.dataset.tab === 'snake' && typeof snakeOnTabOpen === 'function') snakeOnTabOpen();
+    });
+  });
+
+  // ---------- element refs ----------
+  const rows = document.getElementById('rows');
+  const nameInput = document.getElementById('name');
+  const marksInput = document.getElementById('marks');
+  const searchInput = document.getElementById('searchInput');
+  const searchResult = document.getElementById('searchResult');
+  const topperVal = document.getElementById('topperVal');
+  const avgVal = document.getElementById('avgVal');
+  const countVal = document.getElementById('countVal');
+  const undoBtn = document.getElementById('undoBtn');
+  const historyHint = document.getElementById('historyHint');
+  const kthInput = document.getElementById('kthInput');
+  const kthResult = document.getElementById('kthResult');
+  const barray = document.getElementById('barray');
+  const bsearchLog = document.getElementById('bsearchLog');
+  const bsearchInput = document.getElementById('bsearchInput');
+  const gradeBars = document.getElementById('gradeBars');
+  const queueRow = document.getElementById('queueRow');
+
+  // marks -> letter grade
+  function getGrade(marks) {
+    if (marks >= 90) return 'A';
+    if (marks >= 75) return 'B';
+    if (marks >= 60) return 'C';
+    if (marks >= 40) return 'D';
+    return 'F';
+  }
+  const GRADE_COLORS = { A: 'var(--accent)', B: 'var(--gold)', C: 'var(--text-muted)', D: 'var(--danger)', F: 'var(--danger)' };
+
+  function cellHtml(s, cls, pointerText) {
+    return '<div class="cell ' + (cls || '') + '">' +
+      (pointerText ? '<span class="pointer">' + pointerText + '</span>' : '') +
+      '<span class="nm">' + s.name + '</span>' + s.marks + '</div>';
+  }
+
+  // ---------- queue (FIFO) ----------
+  const RECENT_LIMIT = 5;
+  const recentQueue = [];
+  function enqueueRecent(name) {
+    recentQueue.push(name);
+    if (recentQueue.length > RECENT_LIMIT) recentQueue.shift();
+    renderQueue();
+  }
+  function renderQueue() {
+    queueRow.innerHTML = '';
+    if (recentQueue.length === 0) {
+      queueRow.innerHTML = '<div class="empty-msg">No additions yet.</div>';
+      return;
+    }
+    let html = '<span class="queue-end-label">front</span>';
+    recentQueue.forEach((name, i) => {
+      if (i > 0) html += '<span class="queue-arrow">&larr;</span>';
+      html += '<span class="qcell' + (i === 0 ? ' front' : '') + '">' + name + '</span>';
+    });
+    html += '<span class="queue-end-label">back</span>';
+    queueRow.innerHTML = html;
+  }
+
+  // ---------- grade distribution (HashMap) ----------
+  function renderGradeDistribution() {
+    const counts = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+    students.forEach(s => { counts[getGrade(s.marks)]++; });
+    const max = Math.max(...Object.values(counts), 1);
+    gradeBars.innerHTML = '';
+    const fills = [];
+    Object.entries(counts).forEach(([grade, count], i) => {
+      const row = document.createElement('div');
+      row.className = 'grade-bar-row';
+      const pct = Math.round((count / max) * 100);
+      row.innerHTML =
+        '<span class="glabel" style="color:' + GRADE_COLORS[grade] + '">' + grade + '</span>' +
+        '<span class="gtrack"><span class="gfill" style="width:0%; background:' + GRADE_COLORS[grade] + '; transition-delay:' + (i * 90) + 'ms"></span></span>' +
+        '<span class="gcount">' + count + '</span>';
+      gradeBars.appendChild(row);
+      fills.push({ el: row.querySelector('.gfill'), pct });
+    });
+    void gradeBars.offsetWidth;
+    fills.forEach(f => { f.el.style.width = f.pct + '%'; });
+  }
+
+  // ---------- main render ----------
+  function render() {
+    const sorted = [...students].sort((a, b) => b.marks - a.marks);
+    rows.innerHTML = '';
+    if (sorted.length === 0) {
+      rows.innerHTML = '<div class="empty-msg">No students yet — add one above to get started.</div>';
+    } else {
+      const maxMarks = Math.max(...sorted.map(s => s.marks), 1);
+      sorted.forEach((s, i) => {
+        const row = document.createElement('div');
+        row.className = 'row' + (i === 0 ? ' rank1' : '') + (s.name === lastAddedName ? ' new' : '');
+        const pct = Math.max(4, Math.round((s.marks / maxMarks) * 100));
+        const grade = getGrade(s.marks);
+        row.innerHTML =
+          '<span class="rank">' + (i + 1) + (i === 0 ? ' &#9733;' : '') + '</span>' +
+          '<span class="mid"><span class="name">' + s.name + ' <span class="grade-badge g-' + grade + '">' + grade + '</span></span>' +
+          '<span class="bar-track"><span class="bar-fill" style="width:' + pct + '%"></span></span></span>' +
+          '<span class="marks">' + s.marks + '<button class="del-btn" data-name="' + s.name + '" title="Delete">&times;</button></span>';
+        rows.appendChild(row);
+      });
+      rows.querySelectorAll('.del-btn').forEach(btn => {
+        btn.addEventListener('click', () => deleteStudent(btn.dataset.name));
+      });
+    }
+
+    if (students.length > 0) {
+      const topper = sorted[0];
+      const avg = students.reduce((sum, s) => sum + s.marks, 0) / students.length;
+      topperVal.textContent = topper.name + ' (' + topper.marks + ')';
+      avgVal.textContent = avg.toFixed(1);
+    } else {
+      topperVal.textContent = '—';
+      avgVal.textContent = '—';
+    }
+    countVal.textContent = students.length;
+    lastAddedName = null;
+    undoBtn.disabled = history.length === 0;
+    historyHint.textContent = history.length ? history.length + ' action(s) on the undo stack' : '';
+
+    renderBinaryArray();
+    renderGradeDistribution();
+    renderStaticCell('twosumArray');
+    renderStaticCell('reverseArray');
+    renderStaticCell('dupArray');
+    renderStaticCell('windowArray');
+    renderStaticCell('bubbleArray');
+    renderStaticCell('selectionArray');
+    renderStaticCell('insertionArray');
+    renderStaticCell('mergeArray');
+    renderStaticCell('linearSearchArray');
+  }
+
+  function renderStaticCell(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = students.map(s => cellHtml(s)).join('');
+  }
+
+  // ---------- add / delete / undo ----------
+  function addStudent(name, marks, recordHistory = true) {
+    students.push({ name, marks });
+    lastAddedName = name;
+    if (recordHistory) history.push({ type: 'add', name });
+    enqueueRecent(name);
+    render();
+  }
+  function deleteStudent(name, recordHistory = true) {
+    const idx = students.findIndex(s => s.name === name);
+    if (idx === -1) return;
+    const [removed] = students.splice(idx, 1);
+    if (recordHistory) history.push({ type: 'delete', student: removed, index: idx });
+    render();
+  }
+  undoBtn.addEventListener('click', () => {
+    const action = history.pop();
+    if (!action) return;
+    if (action.type === 'add') deleteStudent(action.name, false);
+    else if (action.type === 'delete') { students.splice(action.index, 0, action.student); lastAddedName = action.student.name; render(); }
+    undoBtn.disabled = history.length === 0;
+    historyHint.textContent = history.length ? history.length + ' action(s) on the undo stack' : '';
+  });
+
+  document.getElementById('kthBtn').addEventListener('click', () => {
+    const k = parseInt(kthInput.value, 10);
+    if (Number.isNaN(k) || k < 1 || k > students.length) {
+      kthResult.textContent = 'Enter a valid rank between 1 and ' + students.length + '.';
+      kthResult.style.color = 'var(--danger)';
+      return;
+    }
+    const sorted = [...students].sort((a, b) => b.marks - a.marks);
+    const s = sorted[k - 1];
+    kthResult.textContent = '#' + k + ' highest → ' + s.name + ' (' + s.marks + ' marks)';
+    kthResult.style.color = 'var(--accent)';
+  });
+
+  // ---------- binary search ----------
+  function renderBinaryArray(highlight) {
+    const sortedAsc = [...students].sort((a, b) => a.marks - b.marks);
+    barray.innerHTML = sortedAsc.map((s, i) => {
+      let cls = '', pointerText = '';
+      if (highlight) {
+        if (i < highlight.low || i > highlight.high) cls = 'cell-discarded';
+        else if (i === highlight.mid) { cls = highlight.hit ? 'cell-hit' : 'cell-compare'; pointerText = highlight.hit ? 'FOUND' : 'MID'; }
+        else cls = 'cell-range';
+      }
+      return cellHtml(s, cls, pointerText);
+    }).join('');
+  }
+
+  async function binarySearch(targetMarks) {
+    const sortedAsc = [...students].sort((a, b) => a.marks - b.marks);
+    let low = 0, high = sortedAsc.length - 1, step = 0;
+    bsearchLog.innerHTML = 'Sorted ascending — searching for ' + targetMarks + ' marks...';
+    await sleep(300);
+    while (low <= high) {
+      step++;
+      const mid = Math.floor((low + high) / 2);
+      const midMarks = sortedAsc[mid].marks;
+      renderBinaryArray({ low, high, mid });
+      bsearchLog.innerHTML = 'Step ' + step + ': low=' + low + ', high=' + high + ', mid=' + mid + ' → checking ' + sortedAsc[mid].name + ' (' + midMarks + ' marks)';
+      await sleep(600);
+      if (midMarks === targetMarks) {
+        renderBinaryArray({ low, high, mid, hit: true });
+        bsearchLog.innerHTML = '<span class="ok">Found ' + sortedAsc[mid].name + ' with ' + targetMarks + ' marks in ' + step + ' step(s).</span>';
+        return;
+      } else if (midMarks < targetMarks) low = mid + 1;
+      else high = mid - 1;
+    }
+    bsearchLog.innerHTML = '<span class="no">No student with exactly ' + targetMarks + ' marks (' + step + ' step(s) checked).</span>';
+    renderBinaryArray();
+  }
+  document.getElementById('bsearchBtn').addEventListener('click', () => {
+    const target = parseInt(bsearchInput.value, 10);
+    if (Number.isNaN(target)) return;
+    binarySearch(target);
+  });
+  bsearchInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('bsearchBtn').click(); });
+
+  // ---------- linear search (its own animated demo) ----------
+  const linearSearchArray = document.getElementById('linearSearchArray');
+  const linearSearchLog = document.getElementById('linearSearchLog');
+  const linearSearchInput = document.getElementById('linearSearchInput');
+  const linearSearchBtn = document.getElementById('linearSearchBtn');
+
+  function renderLinearArray(highlight) {
+    linearSearchArray.innerHTML = students.map((s, i) => {
+      let cls = '', pointerText = '';
+      if (highlight) {
+        if (i === highlight.at) { cls = highlight.hit ? 'cell-hit' : 'cell-checking'; pointerText = highlight.hit ? 'FOUND' : 'CHECK'; }
+        else if (i < highlight.at) cls = 'cell-seen';
+      }
+      return cellHtml(s, cls, pointerText);
+    }).join('');
+  }
+
+  async function runLinearSearch(query) {
+    if (students.length === 0) { linearSearchLog.textContent = 'Add at least 1 student first.'; return; }
+    linearSearchBtn.disabled = true;
+    for (let i = 0; i < students.length; i++) {
+      linearSearchLog.textContent = 'Checking index ' + i + ': ' + students[i].name;
+      renderLinearArray({ at: i });
+      await sleep(450);
+      if (students[i].name.toLowerCase() === query) {
+        renderLinearArray({ at: i, hit: true });
+        linearSearchLog.innerHTML = '<span class="ok">Found ' + students[i].name + ' (' + students[i].marks + ' marks) after ' + (i + 1) + ' check(s).</span>';
+        linearSearchBtn.disabled = false;
+        return;
+      }
+    }
+    renderLinearArray();
+    linearSearchLog.innerHTML = '<span class="no">Not found — checked all ' + students.length + ' student(s).</span>';
+    linearSearchBtn.disabled = false;
+  }
+  linearSearchBtn.addEventListener('click', () => {
+    const q = linearSearchInput.value.trim().toLowerCase();
+    if (!q) return;
+    runLinearSearch(q);
+  });
+  linearSearchInput.addEventListener('keydown', e => { if (e.key === 'Enter') linearSearchBtn.click(); });
+
+  document.getElementById('searchBtn').addEventListener('click', () => {
+    const query = searchInput.value.trim().toLowerCase();
+    if (!query) return;
+    let steps = 0, found = null;
+    for (const s of students) {
+      steps++;
+      if (s.name.toLowerCase() === query) { found = s; break; }
+    }
+    if (found) {
+      searchResult.textContent = 'Found: ' + found.name + ' scored ' + found.marks + ' marks (checked ' + steps + ' student(s)).';
+      searchResult.className = 'found';
+    } else {
+      searchResult.textContent = '"' + searchInput.value.trim() + '" not found (checked all ' + steps + ' student(s)).';
+      searchResult.className = 'notfound';
+    }
+  });
+  searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('searchBtn').click(); });
+
+  // ---------- generic animated sort runner ----------
+  async function runComparisonSort(opts) {
+    const { btn, arrayId, logEl, algoName, compareFn } = opts;
+    if (students.length < 2) { logEl.textContent = 'Add at least 2 students first.'; return; }
+    btn.disabled = true;
+    const arr = students.map(s => ({ ...s }));
+    await compareFn(arr, arrayId, logEl);
+    btn.disabled = false;
+  }
+
+  function paintCells(arrayId, arr, classForIndex) {
+    document.getElementById(arrayId).innerHTML = arr.map((s, i) => {
+      const c = classForIndex(i);
+      return cellHtml(s, c.cls, c.pointer);
+    }).join('');
+  }
+
+  // Bubble sort
+  document.getElementById('bubbleBtn').addEventListener('click', () => runComparisonSort({
+    btn: document.getElementById('bubbleBtn'), arrayId: 'bubbleArray', logEl: document.getElementById('bubbleLog'),
+    algoName: 'Bubble Sort',
+    compareFn: async (arr, arrayId, logEl) => {
+      const n = arr.length; let comparisons = 0, swaps = 0;
+      paintCells(arrayId, arr, () => ({}));
+      await sleep(250);
+      for (let pass = 0; pass < n - 1; pass++) {
+        let swapped = false;
+        for (let i = 0; i < n - pass - 1; i++) {
+          comparisons++;
+          logEl.textContent = 'Pass ' + (pass + 1) + ': comparing ' + arr[i].name + ' and ' + arr[i + 1].name;
+          paintCells(arrayId, arr, idx => idx === i || idx === i + 1 ? { cls: 'cell-compare' } : idx >= n - pass ? { cls: 'cell-settled' } : {});
+          await sleep(400);
+          if (arr[i].marks > arr[i + 1].marks) {
+            [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]]; swaps++; swapped = true;
+            paintCells(arrayId, arr, idx => idx === i || idx === i + 1 ? { cls: 'cell-swap' } : idx >= n - pass ? { cls: 'cell-settled' } : {});
+            await sleep(350);
+          }
+        }
+        if (!swapped) break;
+      }
+      paintCells(arrayId, arr, () => ({ cls: 'cell-settled' }));
+      logEl.innerHTML = '<span class="done">Sorted in ' + comparisons + ' comparison(s), ' + swaps + ' swap(s).</span>';
+      return { comparisons };
+    }
+  }));
+
+  // Selection sort
+  document.getElementById('selectionBtn').addEventListener('click', () => runComparisonSort({
+    btn: document.getElementById('selectionBtn'), arrayId: 'selectionArray', logEl: document.getElementById('selectionLog'),
+    algoName: 'Selection Sort',
+    compareFn: async (arr, arrayId, logEl) => {
+      const n = arr.length; let comparisons = 0, swaps = 0;
+      paintCells(arrayId, arr, () => ({}));
+      await sleep(250);
+      for (let i = 0; i < n - 1; i++) {
+        let minIdx = i;
+        for (let j = i + 1; j < n; j++) {
+          comparisons++;
+          logEl.textContent = 'Pass ' + (i + 1) + ': current min is ' + arr[minIdx].name + ', checking ' + arr[j].name;
+          paintCells(arrayId, arr, idx => idx === minIdx ? { cls: 'cell-active', pointer: 'MIN' } : idx === j ? { cls: 'cell-compare' } : idx < i ? { cls: 'cell-settled' } : {});
+          await sleep(380);
+          if (arr[j].marks < arr[minIdx].marks) minIdx = j;
+        }
+        if (minIdx !== i) {
+          [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]]; swaps++;
+          paintCells(arrayId, arr, idx => idx === i ? { cls: 'cell-swap' } : idx <= i ? { cls: 'cell-settled' } : {});
+          await sleep(350);
+        }
+      }
+      paintCells(arrayId, arr, () => ({ cls: 'cell-settled' }));
+      logEl.innerHTML = '<span class="done">Sorted in ' + comparisons + ' comparison(s), ' + swaps + ' swap(s).</span>';
+      return { comparisons };
+    }
+  }));
+
+  // Insertion sort
+  document.getElementById('insertionBtn').addEventListener('click', () => runComparisonSort({
+    btn: document.getElementById('insertionBtn'), arrayId: 'insertionArray', logEl: document.getElementById('insertionLog'),
+    algoName: 'Insertion Sort',
+    compareFn: async (arr, arrayId, logEl) => {
+      const n = arr.length; let comparisons = 0, shifts = 0;
+      paintCells(arrayId, arr, idx => idx === 0 ? { cls: 'cell-settled' } : {});
+      await sleep(250);
+      for (let i = 1; i < n; i++) {
+        const key = arr[i];
+        let j = i - 1;
+        logEl.textContent = 'Inserting ' + key.name + ' (' + key.marks + ') into the sorted portion';
+        paintCells(arrayId, arr, idx => idx === i ? { cls: 'cell-active', pointer: 'KEY' } : idx < i ? { cls: 'cell-settled' } : {});
+        await sleep(400);
+        while (j >= 0) {
+          comparisons++;
+          if (arr[j].marks > key.marks) {
+            arr[j + 1] = arr[j]; shifts++; j--;
+            paintCells(arrayId, arr, idx => idx === j + 1 ? { cls: 'cell-swap' } : idx <= i ? { cls: 'cell-settled' } : {});
+            await sleep(320);
+          } else break;
+        }
+        arr[j + 1] = key;
+        paintCells(arrayId, arr, idx => idx <= i ? { cls: 'cell-settled' } : {});
+        await sleep(200);
+      }
+      logEl.innerHTML = '<span class="done">Sorted in ' + comparisons + ' comparison(s), ' + shifts + ' shift(s).</span>';
+      return { comparisons };
+    }
+  }));
+
+  // Merge sort — visualized as a log of splits and merges, final array settles
+  document.getElementById('mergeBtn').addEventListener('click', () => runComparisonSort({
+    btn: document.getElementById('mergeBtn'), arrayId: 'mergeArray', logEl: document.getElementById('mergeLog'),
+    algoName: 'Merge Sort',
+    compareFn: async (arr, arrayId, logEl) => {
+      let comparisons = 0;
+      const steps = [];
+      function mergeSort(a, depth) {
+        if (a.length <= 1) return a;
+        const mid = Math.floor(a.length / 2);
+        const left = mergeSort(a.slice(0, mid), depth + 1);
+        const right = mergeSort(a.slice(mid), depth + 1);
+        steps.push({ type: 'split', left: left.map(s => s.name), right: right.map(s => s.name) });
+        const merged = [];
+        let i = 0, j = 0;
+        while (i < left.length && j < right.length) {
+          comparisons++;
+          if (left[i].marks <= right[j].marks) merged.push(left[i++]);
+          else merged.push(right[j++]);
+        }
+        while (i < left.length) merged.push(left[i++]);
+        while (j < right.length) merged.push(right[j++]);
+        steps.push({ type: 'merge', result: merged.map(s => s.name) });
+        return merged;
+      }
+      const sorted = mergeSort(arr, 0);
+      for (const step of steps) {
+        if (step.type === 'split') logEl.textContent = 'Merging [' + step.left.join(', ') + '] with [' + step.right.join(', ') + ']';
+        else logEl.textContent = '→ merged into [' + step.result.join(', ') + ']';
+        await sleep(450);
+      }
+      paintCells(arrayId, sorted, () => ({ cls: 'cell-settled' }));
+      arr.length = 0; arr.push(...sorted);
+      logEl.innerHTML = '<span class="done">Sorted via divide &amp; conquer, ' + comparisons + ' merge comparison(s).</span>';
+      return { comparisons };
+    }
+  }));
+
+  // ---------- two sum ----------
+  document.getElementById('twosumBtn').addEventListener('click', () => {
+    const target = parseInt(document.getElementById('twosumInput').value, 10);
+    if (Number.isNaN(target)) return;
+    runTwoSum(target);
+  });
+  document.getElementById('twosumInput').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('twosumBtn').click(); });
+
+  async function runTwoSum(target) {
+    const btn = document.getElementById('twosumBtn'), logEl = document.getElementById('twosumLog'), arrayId = 'twosumArray';
+    btn.disabled = true;
+    const seen = {};
+    paintCells(arrayId, students, () => ({}));
+    await sleep(200);
+    for (let i = 0; i < students.length; i++) {
+      const complement = target - students[i].marks;
+      logEl.textContent = 'Checking ' + students[i].name + ' (' + students[i].marks + ') — need ' + complement + ' to reach ' + target;
+      paintCells(arrayId, students, idx => idx === i ? { cls: 'cell-checking', pointer: 'CHECK' } : idx < i ? { cls: 'cell-seen' } : {});
+      await sleep(550);
+      if (complement in seen) {
+        const j = seen[complement];
+        paintCells(arrayId, students, idx => idx === i || idx === j ? { cls: 'cell-hit', pointer: 'MATCH' } : {});
+        logEl.innerHTML = '<span class="hit-gold">Found: ' + students[j].name + ' (' + students[j].marks + ') + ' + students[i].name + ' (' + students[i].marks + ') = ' + target + '</span>';
+        btn.disabled = false;
+        return;
+      }
+      seen[students[i].marks] = i;
+    }
+    paintCells(arrayId, students, () => ({}));
+    logEl.innerHTML = '<span class="no">No pair of students adds up to ' + target + '.</span>';
+    btn.disabled = false;
+  }
+
+  // ---------- reverse (two-pointer) ----------
+  document.getElementById('reverseBtn').addEventListener('click', runReverse);
+  async function runReverse() {
+    const btn = document.getElementById('reverseBtn'), logEl = document.getElementById('reverseLog'), arrayId = 'reverseArray';
+    if (students.length < 2) { logEl.textContent = 'Add at least 2 students first.'; return; }
+    btn.disabled = true;
+    let left = 0, right = students.length - 1;
+    paintCells(arrayId, students, () => ({}));
+    await sleep(200);
+    while (left < right) {
+      logEl.textContent = 'Swapping ' + students[left].name + ' (index ' + left + ') with ' + students[right].name + ' (index ' + right + ')';
+      paintCells(arrayId, students, idx => idx === left ? { cls: 'cell-active', pointer: 'LEFT' } : idx === right ? { cls: 'cell-active', pointer: 'RIGHT' } : (idx < left || idx > right) ? { cls: 'cell-settled' } : {});
+      await sleep(550);
+      [students[left], students[right]] = [students[right], students[left]];
+      paintCells(arrayId, students, idx => idx === left || idx === right ? { cls: 'cell-swap' } : (idx < left || idx > right) ? { cls: 'cell-settled' } : {});
+      await sleep(350);
+      left++; right--;
+    }
+    render();
+    logEl.innerHTML = '<span class="done">List reversed.</span>';
+    btn.disabled = false;
+  }
+
+  // ---------- sliding window ----------
+  document.getElementById('windowBtn').addEventListener('click', () => {
+    const k = parseInt(document.getElementById('windowInput').value, 10);
+    if (Number.isNaN(k) || k < 1 || k > students.length) {
+      document.getElementById('windowLog').textContent = 'Enter a window size between 1 and ' + students.length + '.';
+      return;
+    }
+    runSlidingWindow(k);
+  });
+
+  async function runSlidingWindow(k) {
+    const btn = document.getElementById('windowBtn'), logEl = document.getElementById('windowLog'), arrayId = 'windowArray';
+    btn.disabled = true;
+    let windowSum = 0;
+    for (let i = 0; i < k; i++) windowSum += students[i].marks;
+    let bestSum = windowSum, bestStart = 0;
+    paintCells(arrayId, students, idx => idx < k ? { cls: 'cell-window' } : {});
+    logEl.textContent = 'Initial window [0, ' + (k - 1) + '] sum = ' + windowSum;
+    await sleep(600);
+
+    for (let i = k; i < students.length; i++) {
+      windowSum += students[i].marks - students[i - k].marks;
+      const start = i - k + 1;
+      paintCells(arrayId, students, idx => idx >= start && idx <= i ? { cls: 'cell-window' } : {});
+      logEl.textContent = 'Slide to [' + start + ', ' + i + ']: drop ' + students[i - k].name + ', add ' + students[i].name + ' → sum = ' + windowSum;
+      await sleep(600);
+      if (windowSum > bestSum) { bestSum = windowSum; bestStart = start; }
+    }
+    paintCells(arrayId, students, idx => idx >= bestStart && idx < bestStart + k ? { cls: 'cell-best', pointer: 'BEST' } : {});
+    logEl.innerHTML = '<span class="done">Best average: ' + (bestSum / k).toFixed(2) + ', starting at ' + students[bestStart].name + '.</span>';
+    btn.disabled = false;
+  }
+
+  // ---------- prefix sum ----------
+  let prefixData = [];
+  document.getElementById('prefixBtn').addEventListener('click', () => {
+    const logEl = document.getElementById('prefixLog');
+    if (students.length === 0) { logEl.textContent = 'Add at least 1 student first.'; return; }
+    let runningTotal = 0;
+    prefixData = [];
+    const lines = [];
+    students.forEach((s, i) => {
+      runningTotal += s.marks;
+      const avg = runningTotal / (i + 1);
+      prefixData.push(avg);
+      lines.push('after ' + s.name + ': total=' + runningTotal + ', avg=' + avg.toFixed(2));
+    });
+    logEl.innerHTML = lines.map(l => '<div>' + l + '</div>').join('');
+  });
+
+  // ---------- recursion (call stack) ----------
+  document.getElementById('recurBtn').addEventListener('click', runRecursiveSum);
+  async function runRecursiveSum() {
+    const btn = document.getElementById('recurBtn'), logEl = document.getElementById('recurLog'), framesEl = document.getElementById('stackFrames');
+    if (students.length === 0) { logEl.textContent = 'Add at least 1 student first.'; return; }
+    btn.disabled = true;
+    framesEl.innerHTML = '';
+    const frames = [];
+
+    // push phase — simulate the recursive calls going down
+    for (let i = 0; i < students.length; i++) {
+      const div = document.createElement('div');
+      div.className = 'stack-frame';
+      div.textContent = 'sum(' + i + ') = ' + students[i].name + ' + sum(' + (i + 1) + ')';
+      framesEl.appendChild(div);
+      frames.push(div);
+      logEl.textContent = 'Calling sum(' + i + ') — pushing onto the call stack';
+      await sleep(350);
+    }
+    const baseDiv = document.createElement('div');
+    baseDiv.className = 'stack-frame returning';
+    baseDiv.textContent = 'sum(' + students.length + ') = 0  ← base case';
+    framesEl.appendChild(baseDiv);
+    await sleep(500);
+
+    // unwind phase — pop back up, accumulating the total
+    let total = 0;
+    for (let i = students.length - 1; i >= 0; i--) {
+      total += students[i].marks;
+      frames[i].classList.add('returning');
+      frames[i].textContent = 'sum(' + i + ') = ' + students[i].marks + ' + sum(' + (i + 1) + ') → returns ' + total;
+      logEl.textContent = 'Returning from sum(' + i + ') with running total ' + total;
+      await sleep(400);
+    }
+    logEl.innerHTML = '<span class="done">Recursive sum = ' + total + '</span>';
+    btn.disabled = false;
+  }
+
+  // ---------- duplicate marks (HashSet) ----------
+  document.getElementById('dupBtn').addEventListener('click', runDuplicateCheck);
+  async function runDuplicateCheck() {
+    const btn = document.getElementById('dupBtn'), logEl = document.getElementById('dupLog'), arrayId = 'dupArray';
+    btn.disabled = true;
+    const seen = new Set();
+    const dupMarks = new Set();
+    paintCells(arrayId, students, () => ({}));
+    await sleep(200);
+    for (let i = 0; i < students.length; i++) {
+      const m = students[i].marks;
+      logEl.textContent = 'Checking if ' + m + ' marks already seen...';
+      paintCells(arrayId, students, idx => idx === i ? { cls: 'cell-checking', pointer: 'CHECK' } : dupMarks.has(students[idx].marks) ? { cls: 'cell-dup' } : {});
+      await sleep(450);
+      if (seen.has(m)) dupMarks.add(m);
+      seen.add(m);
+    }
+    paintCells(arrayId, students, idx => dupMarks.has(students[idx].marks) ? { cls: 'cell-dup', pointer: 'DUP' } : {});
+    logEl.innerHTML = dupMarks.size === 0
+      ? '<span class="done">No two students share the same marks.</span>'
+      : '<span class="no">Shared marks: ' + [...dupMarks].join(', ') + '</span>';
+    btn.disabled = false;
+  }
+
+  // ---------- BST ----------
+  document.getElementById('bstBtn').addEventListener('click', runBST);
+  function bstInsert(node, s) {
+    if (!node) return { student: s, left: null, right: null };
+    if (s.marks < node.student.marks) node.left = bstInsert(node.left, s);
+    else node.right = bstInsert(node.right, s);
+    return node;
+  }
+  function bstDepth(node) {
+    if (!node) return 0;
+    return 1 + Math.max(bstDepth(node.left), bstDepth(node.right));
+  }
+  function bstLayout(node, depth, xMin, xMax, positions, rowGap) {
+    if (!node) return;
+    const x = (xMin + xMax) / 2;
+    positions.push({ node, x, y: 34 + depth * rowGap });
+    bstLayout(node.left, depth + 1, xMin, x, positions, rowGap);
+    bstLayout(node.right, depth + 1, x, xMax, positions, rowGap);
+  }
+  async function runBST() {
+    const btn = document.getElementById('bstBtn'), logEl = document.getElementById('bstLog'), svg = document.getElementById('bstSvg');
+    if (students.length === 0) { logEl.textContent = 'Add at least 1 student first.'; return; }
+    btn.disabled = true;
+    let root = null;
+    students.forEach(s => { root = bstInsert(root, s); });
+
+    // scale everything down as the tree gets deeper/bigger, so the whole tree stays visible at once
+    const depth = bstDepth(root);
+    const zoomedOut = depth > 4;
+    const nodeR = zoomedOut ? 16 : 24;
+    const rowGap = zoomedOut ? 46 : 60;
+    const fontSize = zoomedOut ? 9 : 11;
+
+    const width = Math.max(svg.clientWidth || 600, 300);
+    const positions = [];
+    bstLayout(root, 0, 20, width - 20, positions, rowGap);
+    const height = 34 + (depth - 1) * rowGap + 34;
+
+    let svgContent = '';
+    positions.forEach(p => {
+      if (p.node.left) { const c = positions.find(q => q.node === p.node.left); svgContent += '<line class="bst-edge" x1="' + p.x + '" y1="' + p.y + '" x2="' + c.x + '" y2="' + c.y + '"/>'; }
+      if (p.node.right) { const c = positions.find(q => q.node === p.node.right); svgContent += '<line class="bst-edge" x1="' + p.x + '" y1="' + p.y + '" x2="' + c.x + '" y2="' + c.y + '"/>'; }
+    });
+    positions.forEach(p => {
+      svgContent += '<circle class="bst-node-circle" id="bstnode-' + p.node.student.name + '" cx="' + p.x + '" cy="' + p.y + '" r="' + nodeR + '"/>';
+      svgContent += '<text class="bst-node-text" style="font-size:' + fontSize + 'px" x="' + p.x + '" y="' + (p.y - 2) + '">' + p.node.student.name + '</text>';
+      svgContent += '<text class="bst-node-text" style="font-size:' + fontSize + 'px" x="' + p.x + '" y="' + (p.y + fontSize) + '">' + p.node.student.marks + '</text>';
+    });
+    svg.innerHTML = svgContent;
+    svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+    svg.style.height = Math.max(height, 160) + 'px';
+    logEl.textContent = 'Tree built (' + positions.length + ' nodes, ' + depth + ' levels deep). Traversing inorder (left, node, right)...';
+    await sleep(500);
+
+    const order = [];
+    async function inorder(node) {
+      if (!node) return;
+      await inorder(node.left);
+      order.push(node.student.name + '(' + node.student.marks + ')');
+      const circle = document.getElementById('bstnode-' + node.student.name);
+      if (circle) circle.classList.add('visited');
+      logEl.textContent = 'Visiting ' + node.student.name + ' → order so far: ' + order.join(', ');
+      await sleep(450);
+      await inorder(node.right);
+    }
+    await inorder(root);
+    logEl.innerHTML = '<span class="done">Inorder traversal (sorted): ' + order.join(', ') + '</span>';
+    btn.disabled = false;
+  }
+
+  // ---------- wiring for add ----------
+  document.getElementById('addBtn').addEventListener('click', () => {
+    const name = nameInput.value.trim();
+    const marks = parseInt(marksInput.value, 10);
+    if (!name || Number.isNaN(marks)) return;
+    addStudent(name, marks);
+    nameInput.value = ''; marksInput.value = '';
+    nameInput.focus();
+  });
+  [nameInput, marksInput].forEach(el => el.addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('addBtn').click();
+  }));
+
+  // ---------- Sort Snake module: all six sorts as one connected, sliding chain ----------
+  (function () {
+    const SNAKE_ALGOS = {
+      bubble: { label: 'BUBBLE', desc: 'Repeatedly swaps neighboring values that are out of order until the row settles. (O(n&sup2;))' },
+      selection: { label: 'SELECTION', desc: 'Each pass finds the smallest remaining value and swaps it into place. (O(n&sup2;))' },
+      insertion: { label: 'INSERTION', desc: 'Grows a sorted section on the left, sliding each new value into its spot. (O(n&sup2;))' },
+      merge: { label: 'MERGE', desc: 'Splits the chain in half recursively, then merges the halves back in order. (O(n log n))' },
+      quick: { label: 'QUICK', desc: 'Picks a pivot, partitions smaller/larger values around it, and recurses. (O(n log n) avg)' },
+      heap: { label: 'HEAP', desc: 'Builds a max-heap, then repeatedly moves the max to the end and shrinks the heap. (O(n log n))' }
+    };
+
+    let snakeAlgo = 'bubble';
+    let snakeStudents = [];
+    let snakeOrder = [];
+    let snakeRunning = false, snakePaused = false, snakeStopped = false;
+    let snakeComparisons = 0, snakeSwaps = 0, snakeSteps = 0;
+    let snakeSpeedMs = 550;
+    let snakeNodeEls = [];
+
+    const snakeStage = document.getElementById('snakeStage');
+    const snakeSpineSvg = document.getElementById('snakeSpineSvg');
+    const snakeSpinePath = document.getElementById('snakeSpinePath');
+    const snakeStatusLine = document.getElementById('snakeStatusLine');
+    const snakeCompCount = document.getElementById('snakeCompCount');
+    const snakeSwapCount = document.getElementById('snakeSwapCount');
+    const snakeStepCount = document.getElementById('snakeStepCount');
+    const snakePlayBtn = document.getElementById('snakePlayBtn');
+    const snakePauseBtn = document.getElementById('snakePauseBtn');
+    const snakeStopBtn = document.getElementById('snakeStopBtn');
+    const snakeShuffleBtn = document.getElementById('snakeShuffleBtn');
+    const snakeSpeedSlider = document.getElementById('snakeSpeedSlider');
+    const snakeSpeedTag = document.getElementById('snakeSpeedTag');
+    const snakeAlgoBadge = document.getElementById('snakeAlgoBadge');
+    const snakeAlgoDesc = document.getElementById('snakeAlgoDesc');
+    const snakeAlgoBtns = document.querySelectorAll('#snakeAlgoTabs .snake-algo-btn');
+    const snakeSizeSlider = document.getElementById('snakeSizeSlider');
+    const snakeSizeTag = document.getElementById('snakeSizeTag');
+
+    function snakeSetStatus(text) { snakeStatusLine.textContent = text; }
+
+    function snakeLayout(n) {
+      const w = snakeStage.clientWidth || 600, h = snakeStage.clientHeight || 300;
+      const marginX = 46, marginY = 40;
+      const usableW = w - marginX * 2;
+      const cols = Math.min(n, 6);
+      const rows = Math.ceil(n / cols);
+      const stepY = rows > 1 ? (h - marginY * 2) / (rows - 1) : 0;
+      const pos = [];
+      for (let i = 0; i < n; i++) {
+        const row = Math.floor(i / cols);
+        let colInRow = i % cols;
+        const rowLen = Math.min(cols, n - row * cols);
+        const rowStepX = rowLen > 1 ? usableW / (rowLen - 1) : 0;
+        if (row % 2 === 1) colInRow = rowLen - 1 - colInRow; // zigzag so the chain flows continuously
+        pos.push({ x: marginX + colInRow * rowStepX, y: marginY + row * stepY });
+      }
+      return pos;
+    }
+
+    function snakeBuildNodes() {
+      snakeStage.querySelectorAll('.snake-node').forEach(n => n.remove());
+      snakeNodeEls = snakeStudents.map(s => {
+        const el = document.createElement('div');
+        el.className = 'snake-node';
+        el.innerHTML = '<span class="snake-mk">' + s.marks + '</span>';
+        snakeStage.appendChild(el);
+        return el;
+      });
+      snakePositionAll();
+    }
+
+    function snakePositionAll(highlightBySlot) {
+      const n = snakeStudents.length;
+      const pos = snakeLayout(n);
+      snakeOrder.forEach((studentIdx, slot) => {
+        const el = snakeNodeEls[studentIdx];
+        el.style.left = pos[slot].x + 'px';
+        el.style.top = pos[slot].y + 'px';
+        el.className = 'snake-node' + (highlightBySlot && highlightBySlot[slot] ? ' snake-' + highlightBySlot[slot] : '');
+      });
+      snakeSpineSvg.setAttribute('viewBox', '0 0 ' + (snakeStage.clientWidth || 600) + ' ' + (snakeStage.clientHeight || 300));
+      snakeSpinePath.setAttribute('points', pos.map(p => p.x + ',' + p.y).join(' '));
+    }
+
+    function snakeValAt(slot) { return snakeStudents[snakeOrder[slot]].marks; }
+    function snakeAllSettled() { const hl = {}; for (let s = 0; s < snakeStudents.length; s++) hl[s] = 'settled'; return hl; }
+
+    async function snakeTick() {
+      snakeSteps++; snakeStepCount.textContent = snakeSteps;
+      while (snakePaused && !snakeStopped) await sleep(80);
+      if (snakeStopped) throw new Error('stopped');
+      await sleep(snakeSpeedMs);
+    }
+    async function snakeSwapSlots(a, b) {
+      snakeSwaps++; snakeSwapCount.textContent = snakeSwaps;
+      [snakeOrder[a], snakeOrder[b]] = [snakeOrder[b], snakeOrder[a]];
+    }
+    async function snakeRender(hl) { snakePositionAll(hl); }
+
+    async function snakeBubbleSort() {
+      const n = snakeStudents.length;
+      for (let p = 0; p < n - 1; p++) {
+        let didSwap = false;
+        for (let i = 0; i < n - p - 1; i++) {
+          snakeComparisons++; snakeCompCount.textContent = snakeComparisons;
+          snakeSetStatus('Comparing ' + snakeValAt(i) + ' and ' + snakeValAt(i + 1));
+          const hl = { [i]: 'compare', [i + 1]: 'compare' };
+          for (let s = n - p; s < n; s++) hl[s] = 'settled';
+          await snakeRender(hl); await snakeTick();
+          if (snakeValAt(i) > snakeValAt(i + 1)) {
+            await snakeSwapSlots(i, i + 1); didSwap = true;
+            const hl2 = { [i]: 'swap', [i + 1]: 'swap' };
+            for (let s = n - p; s < n; s++) hl2[s] = 'settled';
+            await snakeRender(hl2); await snakeTick();
+          }
+        }
+        if (!didSwap) break;
+      }
+      await snakeRender(snakeAllSettled());
+    }
+
+    async function snakeSelectionSort() {
+      const n = snakeStudents.length;
+      for (let i = 0; i < n - 1; i++) {
+        let minSlot = i;
+        for (let j = i + 1; j < n; j++) {
+          snakeComparisons++; snakeCompCount.textContent = snakeComparisons;
+          snakeSetStatus('Scanning for minimum: ' + snakeValAt(minSlot) + ' vs ' + snakeValAt(j));
+          const hl = { [minSlot]: 'compare', [j]: 'compare' };
+          for (let s = 0; s < i; s++) hl[s] = 'settled';
+          await snakeRender(hl); await snakeTick();
+          if (snakeValAt(j) < snakeValAt(minSlot)) minSlot = j;
+        }
+        if (minSlot !== i) {
+          await snakeSwapSlots(i, minSlot);
+          const hl = { [i]: 'swap' };
+          for (let s = 0; s <= i; s++) hl[s] = 'settled';
+          await snakeRender(hl); await snakeTick();
+        }
+      }
+      await snakeRender(snakeAllSettled());
+    }
+
+    async function snakeInsertionSort() {
+      const n = snakeStudents.length;
+      for (let i = 1; i < n; i++) {
+        let j = i;
+        snakeSetStatus('Inserting ' + snakeValAt(i) + ' into the sorted section');
+        while (j > 0) {
+          snakeComparisons++; snakeCompCount.textContent = snakeComparisons;
+          const hl = { [j]: 'compare', [j - 1]: 'compare' };
+          for (let s = 0; s < i; s++) if (!(s in hl)) hl[s] = 'settled';
+          await snakeRender(hl); await snakeTick();
+          if (snakeValAt(j - 1) > snakeValAt(j)) { await snakeSwapSlots(j - 1, j); j--; }
+          else break;
+        }
+      }
+      await snakeRender(snakeAllSettled());
+    }
+
+    async function snakeMergeSort() {
+      async function sortRange(lo, hi) {
+        if (hi - lo <= 1) return;
+        const mid = Math.floor((lo + hi) / 2);
+        await sortRange(lo, mid);
+        await sortRange(mid, hi);
+        const merged = [];
+        let a = lo, b = mid;
+        while (a < mid && b < hi) {
+          snakeComparisons++; snakeCompCount.textContent = snakeComparisons;
+          await snakeRender({ [a]: 'compare', [b]: 'compare' }); await snakeTick();
+          if (snakeValAt(a) <= snakeValAt(b)) merged.push(snakeOrder[a++]);
+          else merged.push(snakeOrder[b++]);
+        }
+        while (a < mid) merged.push(snakeOrder[a++]);
+        while (b < hi) merged.push(snakeOrder[b++]);
+        for (let k = 0; k < merged.length; k++) snakeOrder[lo + k] = merged[k];
+        const hl = {}; for (let k = lo; k < hi; k++) hl[k] = 'swap';
+        snakeSetStatus('Merged range [' + lo + ', ' + (hi - 1) + ']');
+        await snakeRender(hl); await snakeTick();
+      }
+      await sortRange(0, snakeStudents.length);
+      await snakeRender(snakeAllSettled());
+    }
+
+    async function snakeQuickSort() {
+      async function sortRange(lo, hi) {
+        if (lo >= hi) return;
+        const pivotSlot = hi;
+        const pivotVal = snakeValAt(pivotSlot);
+        let i = lo - 1;
+        for (let j = lo; j < hi; j++) {
+          snakeComparisons++; snakeCompCount.textContent = snakeComparisons;
+          snakeSetStatus('Comparing ' + snakeValAt(j) + ' against pivot ' + pivotVal);
+          await snakeRender({ [pivotSlot]: 'pivot', [j]: 'compare' }); await snakeTick();
+          if (snakeValAt(j) < pivotVal) { i++; if (i !== j) await snakeSwapSlots(i, j); }
+        }
+        await snakeSwapSlots(i + 1, hi);
+        await snakeRender({ [i + 1]: 'settled' }); await snakeTick();
+        await sortRange(lo, i);
+        await sortRange(i + 2, hi);
+      }
+      await sortRange(0, snakeStudents.length - 1);
+      await snakeRender(snakeAllSettled());
+    }
+
+    async function snakeHeapSort() {
+      const n = snakeStudents.length;
+      async function siftDown(root, size) {
+        let largest = root;
+        while (true) {
+          const l = 2 * largest + 1, r = 2 * largest + 2;
+          let candidate = largest;
+          if (l < size) { snakeComparisons++; snakeCompCount.textContent = snakeComparisons; if (snakeValAt(l) > snakeValAt(candidate)) candidate = l; }
+          if (r < size) { snakeComparisons++; snakeCompCount.textContent = snakeComparisons; if (snakeValAt(r) > snakeValAt(candidate)) candidate = r; }
+          const hl = { [largest]: 'compare' }; if (l < size) hl[l] = 'compare'; if (r < size) hl[r] = 'compare';
+          snakeSetStatus('Sifting down from slot ' + largest);
+          await snakeRender(hl); await snakeTick();
+          if (candidate === largest) break;
+          await snakeSwapSlots(largest, candidate);
+          largest = candidate;
+        }
+      }
+      for (let i = Math.floor(n / 2) - 1; i >= 0; i--) await siftDown(i, n);
+      for (let end = n - 1; end > 0; end--) {
+        await snakeSwapSlots(0, end);
+        const hl = {}; for (let s = end; s < n; s++) hl[s] = 'settled';
+        snakeSetStatus('Moved max to slot ' + end);
+        await snakeRender(hl); await snakeTick();
+        await siftDown(0, end);
+      }
+      await snakeRender(snakeAllSettled());
+    }
+
+    const SNAKE_RUNNERS = { bubble: snakeBubbleSort, selection: snakeSelectionSort, insertion: snakeInsertionSort, merge: snakeMergeSort, quick: snakeQuickSort, heap: snakeHeapSort };
+
+    // independent random practice data — nothing to do with the class list
+    function snakeGenerateValues(count) {
+      const pool = [];
+      for (let v = 1; v <= 99; v++) pool.push(v);
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      return pool.slice(0, count).map(marks => ({ marks }));
+    }
+
+    function snakeResetChain() {
+      const count = parseInt(snakeSizeSlider.value, 10);
+      snakeStudents = snakeGenerateValues(count);
+      snakeOrder = snakeStudents.map((_, i) => i);
+      snakeComparisons = 0; snakeSwaps = 0; snakeSteps = 0;
+      snakeCompCount.textContent = 0; snakeSwapCount.textContent = 0; snakeStepCount.textContent = 0;
+      snakeBuildNodes();
+      snakeSetStatus('Pick an algorithm, then press Play.');
+    }
+
+    async function snakeRunSort() {
+      if (snakeStudents.length < 2) { snakeSetStatus('Need at least 2 values.'); return; }
+      snakeRunning = true; snakeStopped = false; snakePaused = false;
+      snakePlayBtn.disabled = true; snakePauseBtn.disabled = false; snakeStopBtn.disabled = false; snakeShuffleBtn.disabled = true;
+      snakeAlgoBtns.forEach(b => b.disabled = true);
+      try {
+        await SNAKE_RUNNERS[snakeAlgo]();
+        snakeSetStatus('Sorted in ' + snakeComparisons + ' comparison(s), ' + snakeSwaps + ' swap(s).');
+      } catch (e) {
+        snakeSetStatus('Stopped.');
+      }
+      snakeRunning = false;
+      snakePlayBtn.disabled = false; snakePauseBtn.disabled = true; snakeStopBtn.disabled = true; snakeShuffleBtn.disabled = false;
+      snakeAlgoBtns.forEach(b => b.disabled = false);
+    }
+
+    snakePlayBtn.addEventListener('click', () => {
+      if (snakeRunning && snakePaused) { snakePaused = false; snakePauseBtn.innerHTML = '&#10073;&#10073; Pause'; return; }
+      if (!snakeRunning) snakeRunSort();
+    });
+    snakePauseBtn.addEventListener('click', () => {
+      snakePaused = !snakePaused;
+      snakePauseBtn.innerHTML = snakePaused ? '&#9654; Resume' : '&#10073;&#10073; Pause';
+    });
+    snakeStopBtn.addEventListener('click', () => { snakeStopped = true; snakePaused = false; });
+    snakeShuffleBtn.addEventListener('click', () => {
+      if (snakeRunning) return;
+      snakeResetChain();
+      snakeSetStatus('New random values generated — press Play to sort.');
+    });
+    snakeSpeedSlider.addEventListener('input', () => {
+      const map = { 1: [900, 'Slowest'], 2: [700, 'Slow'], 3: [550, 'Normal'], 4: [350, 'Fast'], 5: [180, 'Fastest'] };
+      const [ms, label] = map[snakeSpeedSlider.value];
+      snakeSpeedMs = ms; snakeSpeedTag.textContent = label;
+    });
+    snakeSizeSlider.addEventListener('input', () => {
+      if (snakeRunning) return;
+      snakeSizeTag.textContent = snakeSizeSlider.value;
+      snakeResetChain();
+    });
+    snakeAlgoBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (snakeRunning) return;
+        snakeAlgoBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        snakeAlgo = btn.dataset.algo;
+        snakeAlgoBadge.textContent = SNAKE_ALGOS[snakeAlgo].label;
+        snakeAlgoDesc.innerHTML = SNAKE_ALGOS[snakeAlgo].desc;
+        snakeResetChain();
+      });
+    });
+    window.addEventListener('resize', () => { if (snakeStudents.length) snakePositionAll(); });
+
+    let snakeInitialized = false;
+    window.snakeOnTabOpen = function () {
+      if (snakeInitialized) { snakePositionAll(); return; } // just re-lay-out in case the panel was hidden during a resize
+      snakeInitialized = true;
+      snakeResetChain();
+    };
+  })();
+
+  // ---------- lab tab switching (inside the Learn section) ----------
+  document.querySelectorAll('#labTabs .snake-algo-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#labTabs .snake-algo-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.lab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelector('.lab-panel[data-lab-panel="' + btn.dataset.lab + '"]').classList.add('active');
+    });
+  });
+
+  // ---------- Searching lab: linear vs binary, independent sorted data ----------
+  (function () {
+    let arr = [];
+    const target = document.getElementById('searchLabTarget');
+    const arrayEl = document.getElementById('searchLabArray');
+    const status = document.getElementById('searchLabStatus');
+    const checksEl = document.getElementById('searchLabChecks');
+
+    function generate() {
+      const pool = [];
+      for (let v = 1; v <= 99; v++) pool.push(v);
+      for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+      arr = pool.slice(0, 12).sort((a, b) => a - b);
+      renderArr();
+      status.textContent = 'Pick a value, then run a search.';
+      checksEl.textContent = '0';
+    }
+
+    function renderArr(highlight) {
+      arrayEl.innerHTML = arr.map((v, i) => {
+        let cls = '', pointer = '';
+        if (highlight) {
+          if (i < highlight.low || i > highlight.high) cls = 'cell-discarded';
+          else if (i === highlight.at) { cls = highlight.hit ? 'cell-hit' : 'cell-compare'; pointer = highlight.hit ? 'FOUND' : (highlight.mode === 'linear' ? 'CHECK' : 'MID'); }
+          else if (highlight.mode === 'binary') cls = 'cell-range';
+        }
+        return '<div class="cell ' + cls + '">' + (pointer ? '<span class="pointer">' + pointer + '</span>' : '') + v + '</div>';
+      }).join('');
+    }
+
+    async function runLinear(t) {
+      let checks = 0;
+      for (let i = 0; i < arr.length; i++) {
+        checks++; checksEl.textContent = checks;
+        status.textContent = 'Checking index ' + i + ' (' + arr[i] + ')';
+        renderArr({ low: 0, high: arr.length - 1, at: i, mode: 'linear' });
+        await sleep(400);
+        if (arr[i] === t) { renderArr({ low: 0, high: arr.length - 1, at: i, hit: true, mode: 'linear' }); status.innerHTML = '<span class="ok">Found ' + t + ' after ' + checks + ' check(s).</span>'; return; }
+      }
+      renderArr(); status.innerHTML = '<span class="no">' + t + ' not found (' + checks + ' check(s)).</span>';
+    }
+    async function runBinary(t) {
+      let low = 0, high = arr.length - 1, checks = 0;
+      while (low <= high) {
+        checks++; checksEl.textContent = checks;
+        const mid = Math.floor((low + high) / 2);
+        status.textContent = 'low=' + low + ', high=' + high + ', mid=' + mid + ' (' + arr[mid] + ')';
+        renderArr({ low, high, at: mid, mode: 'binary' });
+        await sleep(500);
+        if (arr[mid] === t) { renderArr({ low, high, at: mid, hit: true, mode: 'binary' }); status.innerHTML = '<span class="ok">Found ' + t + ' in ' + checks + ' check(s).</span>'; return; }
+        else if (arr[mid] < t) low = mid + 1; else high = mid - 1;
+      }
+      renderArr(); status.innerHTML = '<span class="no">' + t + ' not found (' + checks + ' check(s)).</span>';
+    }
+
+    document.getElementById('searchLabLinearBtn').addEventListener('click', () => {
+      const t = parseInt(target.value, 10); if (Number.isNaN(t)) return; runLinear(t);
+    });
+    document.getElementById('searchLabBinaryBtn').addEventListener('click', () => {
+      const t = parseInt(target.value, 10); if (Number.isNaN(t)) return; runBinary(t);
+    });
+    document.getElementById('searchLabShuffleBtn').addEventListener('click', generate);
+    generate();
+  })();
+
+  // ---------- Stack & Queue lab ----------
+  (function () {
+    const stack = [], queue = [];
+    const stackWell = document.getElementById('stackWell');
+    const queueWell = document.getElementById('queueWell');
+    const status = document.getElementById('sqStatus');
+
+    function renderStack() {
+      stackWell.innerHTML = stack.length === 0 ? '<span class="sq-empty">Empty — nothing pushed yet.</span>' :
+        stack.map((v, i) => '<span class="sq-chip' + (i === stack.length - 1 ? ' sq-top' : '') + '">' + v + (i === stack.length - 1 ? ' ← top' : '') + '</span>').join('');
+    }
+    function renderQueue() {
+      queueWell.innerHTML = queue.length === 0 ? '<span class="sq-empty">Empty — nothing enqueued yet.</span>' :
+        queue.map((v, i) => '<span class="sq-chip' + (i === 0 ? ' sq-front' : '') + '">' + v + (i === 0 ? ' front' : '') + '</span>').join('');
+    }
+    function randVal() { return Math.floor(Math.random() * 90) + 10; }
+
+    document.getElementById('stackPushBtn').addEventListener('click', () => {
+      const v = randVal(); stack.push(v); renderStack();
+      status.textContent = 'Pushed ' + v + ' onto the stack (now on top).';
+    });
+    document.getElementById('stackPopBtn').addEventListener('click', () => {
+      if (stack.length === 0) { status.textContent = 'Stack is empty — nothing to pop.'; return; }
+      const v = stack.pop(); renderStack();
+      status.textContent = 'Popped ' + v + ' — it was the most recently pushed (LIFO).';
+    });
+    document.getElementById('queuePushBtn').addEventListener('click', () => {
+      const v = randVal(); queue.push(v); renderQueue();
+      status.textContent = 'Enqueued ' + v + ' at the back.';
+    });
+    document.getElementById('queuePopBtn').addEventListener('click', () => {
+      if (queue.length === 0) { status.textContent = 'Queue is empty — nothing to dequeue.'; return; }
+      const v = queue.shift(); renderQueue();
+      status.textContent = 'Dequeued ' + v + ' — it was the longest-waiting item (FIFO).';
+    });
+    renderStack(); renderQueue();
+  })();
+
+  // ---------- Recursion lab: factorial via call stack ----------
+  (function () {
+    const input = document.getElementById('recurLabInput');
+    const status = document.getElementById('recurLabStatus');
+    const frames = document.getElementById('recurLabFrames');
+
+    async function run() {
+      const n = parseInt(input.value, 10);
+      if (Number.isNaN(n) || n < 0 || n > 10) { status.textContent = 'Enter a whole number from 0 to 10.'; return; }
+      document.getElementById('recurLabBtn').disabled = true;
+      frames.innerHTML = '';
+      const els = [];
+      for (let i = n; i > 0; i--) {
+        const el = document.createElement('div');
+        el.className = 'stack-frame';
+        el.textContent = 'factorial(' + i + ') = ' + i + ' × factorial(' + (i - 1) + ')';
+        frames.appendChild(el); els.push(el);
+        status.textContent = 'Calling factorial(' + i + ') — pushing onto the call stack';
+        await sleep(380);
+      }
+      const base = document.createElement('div');
+      base.className = 'stack-frame returning';
+      base.textContent = 'factorial(0) = 1  ← base case';
+      frames.appendChild(base);
+      await sleep(500);
+
+      let result = 1;
+      for (let i = 1; i <= n; i++) {
+        result *= i;
+        els[n - i].classList.add('returning');
+        els[n - i].textContent = 'factorial(' + i + ') = ' + i + ' × factorial(' + (i - 1) + ') → returns ' + result;
+        status.textContent = 'Returning from factorial(' + i + ') with running product ' + result;
+        await sleep(400);
+      }
+      status.innerHTML = '<span class="ok">factorial(' + n + ') = ' + result + '</span>';
+      document.getElementById('recurLabBtn').disabled = false;
+    }
+    document.getElementById('recurLabBtn').addEventListener('click', run);
+  })();
+
+  // ---------- Hashing lab ----------
+  (function () {
+    const BUCKET_COUNT = 7;
+    let buckets = Array.from({ length: BUCKET_COUNT }, () => []);
+    const wrap = document.getElementById('hashBuckets');
+    const input = document.getElementById('hashLabInput');
+    const log = document.getElementById('hashLabLog');
+
+    function hashOf(word) {
+      let sum = 0;
+      for (let i = 0; i < word.length; i++) sum += word.charCodeAt(i);
+      return sum % BUCKET_COUNT;
+    }
+
+    function render(highlightIdx, collided) {
+      wrap.innerHTML = '';
+      buckets.forEach((chain, i) => {
+        const div = document.createElement('div');
+        div.className = 'hash-bucket' + (i === highlightIdx ? (collided ? ' hash-collision' : ' hash-hit') : '');
+        div.innerHTML = '<div class="hash-bucket-idx">bucket <b>' + i + '</b></div><div class="hash-chain">' +
+          (chain.length ? chain.map(w => '<span class="hash-item">' + w + '</span>').join('') : '<span class="sq-empty">empty</span>') +
+          '</div>';
+        wrap.appendChild(div);
+      });
+    }
+
+    function insert(word) {
+      const sum = word.split('').reduce((s, c) => s + c.charCodeAt(0), 0);
+      const idx = sum % BUCKET_COUNT;
+      const collided = buckets[idx].length > 0;
+      buckets[idx].push(word);
+      render(idx, collided);
+      log.innerHTML = 'insert("' + word + '") &rarr; letters add up to ' + sum + ' &rarr; ' + sum + ' % ' + BUCKET_COUNT + ' = <b>' + idx + '</b>' +
+        (collided ? ' <span class="no">— collision! chained onto what was already there.</span>' : ' <span class="ok">— placed in an empty bucket.</span>');
+    }
+
+    document.getElementById('hashLabBtn').addEventListener('click', () => {
+      const w = input.value.trim().toLowerCase();
+      if (!w) return;
+      insert(w);
+      input.value = '';
+      input.focus();
+    });
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('hashLabBtn').click(); });
+    document.getElementById('hashLabResetBtn').addEventListener('click', () => {
+      buckets = Array.from({ length: BUCKET_COUNT }, () => []);
+      render();
+      log.textContent = 'Table cleared. Type a word and insert it to see which bucket it lands in.';
+    });
+    render();
+  })();
+
+  // ---------- guided tour: walks through the whole app on its own ----------
+  (function () {
+    const tourBtn = document.getElementById('tourBtn');
+    const tourStopBtn = document.getElementById('tourStopBtn');
+    const tourBanner = document.getElementById('tourBanner');
+    const tourBannerText = document.getElementById('tourBannerText');
+    let tourStopped = false;
+
+    function click(id) { const el = document.getElementById(id); if (el) el.click(); }
+    function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
+    function goTab(tab) { click_tab(tab); }
+    function click_tab(tab) {
+      const btn = document.querySelector('.tab-btn[data-tab="' + tab + '"]');
+      if (btn) btn.click();
+    }
+    function say(text) { tourBannerText.textContent = text; }
+    function tourSleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    const TOUR_STEPS = [
+      { tab: 'overview', text: 'Welcome! This is the Overview tab — add students, search, undo, and see live class stats. Watch the top-right corner of each card as we go.', focus: 'tourBanner', wait: 2200 },
+      { tab: 'overview', text: 'Adding a new student "Tour Demo" with 73 marks — it drops straight into the ranked list, sorted automatically.', focus: 'addBtn', action: () => { setVal('name', 'Tour Demo'); setVal('marks', '73'); click('addBtn'); }, wait: 1600 },
+      { tab: 'overview', text: 'Searching for "Tour Demo" — a plain linear scan through the list.', focus: 'searchBtn', action: () => { setVal('searchInput', 'Tour Demo'); click('searchBtn'); }, wait: 1200 },
+      { tab: 'overview', text: 'Undo pops the last action off a Stack (LIFO) and reverses it — Tour Demo disappears again.', focus: 'undoBtn', action: () => click('undoBtn'), wait: 1200 },
+      { tab: 'overview', text: 'Rank lookup jumps straight to any position — here, rank #3.', focus: 'kthBtn', action: () => { setVal('kthInput', '3'); click('kthBtn'); }, wait: 1400 },
+      { tab: 'sorting', text: 'Sorting tab. First up: Bubble Sort — compares neighbors and swaps them if out of order, one pass at a time.', focus: 'bubbleBtn', action: () => click('bubbleBtn'), wait: 7000 },
+      { tab: 'sorting', text: 'Selection Sort — finds the minimum of the unsorted part each pass, one swap per pass.', focus: 'selectionBtn', action: () => click('selectionBtn'), wait: 7000 },
+      { tab: 'sorting', text: 'Insertion Sort — grows a sorted section from the left, shifting values into place.', focus: 'insertionBtn', action: () => click('insertionBtn'), wait: 6000 },
+      { tab: 'sorting', text: 'Merge Sort — divide and conquer: split in half recursively, then merge back in order.', focus: 'mergeBtn', action: () => click('mergeBtn'), wait: 4500 },
+      { tab: 'searching', text: 'Searching tab. Linear Search checks every student one by one.', focus: 'linearSearchBtn', action: () => { setVal('linearSearchInput', 'Priya'); click('linearSearchBtn'); }, wait: 4000 },
+      { tab: 'searching', text: 'Binary Search sorts first, then halves the range each step — far fewer checks.', focus: 'bsearchBtn', action: () => { setVal('bsearchInput', '92'); click('bsearchBtn'); }, wait: 3500 },
+      { tab: 'structures', text: 'Structures tab. This Queue tracks the 5 most recent additions — first in, first out (opposite of the Undo stack).', focus: 'queueRow', wait: 2000 },
+      { tab: 'structures', text: 'Grade Distribution tallies every letter grade in one pass using a HashMap.', focus: 'gradeBars', wait: 1800 },
+      { tab: 'structures', text: 'Checking for duplicate marks using a HashSet — O(1) lookups instead of comparing every pair.', focus: 'dupBtn', action: () => click('dupBtn'), wait: 3500 },
+      { tab: 'structures', text: 'Building a Binary Search Tree — smaller left, larger right — then reading it inorder gives sorted order automatically.', focus: 'bstBtn', action: () => click('bstBtn'), wait: 5500 },
+      { tab: 'patterns', text: 'Patterns tab. "Two Sum": finding two students whose marks add to 170, using a hash map instead of checking every pair.', focus: 'twosumBtn', action: () => { setVal('twosumInput', '170'); click('twosumBtn'); }, wait: 3500 },
+      { tab: 'patterns', text: 'Reversing the list with two pointers — one from each end, swapping toward the middle.', focus: 'reverseBtn', action: () => click('reverseBtn'), wait: 3500 },
+      { tab: 'patterns', text: 'Sliding Window finds the best-average streak of 3 consecutive students.', focus: 'windowBtn', action: () => { setVal('windowInput', '3'); click('windowBtn'); }, wait: 4500 },
+      { tab: 'patterns', text: 'Prefix Sum precomputes running totals, so the class average "so far" is a single lookup.', focus: 'prefixBtn', action: () => click('prefixBtn'), wait: 1200 },
+      { tab: 'patterns', text: 'Recursion sums the marks by calling itself down the list, then adds up as it unwinds — watch the call stack.', focus: 'recurBtn', action: () => click('recurBtn'), wait: 4500 },
+      { tab: 'snake', text: 'Learn tab — standalone practice labs (Sorting, Searching, Stack & Queue, Recursion, Hashing) with their own random data, independent of your class list.', focus: 'labTabs', wait: 2400 },
+      { tab: 'overview', text: "That's the whole project! Every tab is still fully interactive — explore anything, anytime.", focus: 'tourBanner', wait: 2600 },
+    ];
+
+    function scrollToStep(step) {
+      const el = document.getElementById(step.focus || 'tourBanner');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    async function runTour() {
+      tourStopped = false;
+      tourBtn.disabled = true;
+      tourBanner.classList.add('active');
+      const prevSpeedFactor = globalSpeedFactor;
+      globalSpeedFactor = SPEED_FACTORS[4]; // run the tour at a brisk, watchable pace
+      syncSpeedSliders(4);
+
+      for (const step of TOUR_STEPS) {
+        if (tourStopped) break;
+        goTab(step.tab);
+        say(step.text);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        await tourSleep(450);
+        scrollToStep(step);
+        await tourSleep(500);
+        if (tourStopped) break;
+        if (step.action) step.action();
+        await tourSleep(step.wait);
+      }
+
+      globalSpeedFactor = prevSpeedFactor;
+      tourBanner.classList.remove('active');
+      tourBtn.disabled = false;
+    }
+
+    tourBtn.addEventListener('click', runTour);
+    tourStopBtn.addEventListener('click', () => { tourStopped = true; });
+  })();
+
+  // seed with sample data (not recorded in undo history)
+  addStudent('Rahul', 78, false);
+  addStudent('Priya', 92, false);
+  addStudent('Aman', 65, false);
+  addStudent('Sneha', 88, false);
+  addStudent('Kabir', 55, false);
+  addStudent('Isha', 97, false);
+  addStudent('Arjun', 71, false);
+  addStudent('Divya', 83, false);
+  addStudent('Rohan', 46, false);
+  addStudent('Kavya', 90, false);
+  addStudent('Yash', 68, false);
+  addStudent('Neha', 59, false);
+  addStudent('Karan', 76, false);
+  addStudent('Ananya', 99, false);
+  addStudent('Vikram', 39, false);
+  addStudent('Simran', 85, false);
+  addStudent('Aditya', 62, false);
+  addStudent('Meera', 94, false);
+  addStudent('Harsh', 51, false);
+  addStudent('Riya', 80, false);
+})();
+</script>

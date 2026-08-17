@@ -1,0 +1,13 @@
+# Compiled Java classes
+*.class
+
+# Local-only report and its screenshots (not part of the public repo)
+Student_Result_Manager_Report.docx
+report_assets/
+report_assets_v2/
+
+# OS/editor cruft
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json

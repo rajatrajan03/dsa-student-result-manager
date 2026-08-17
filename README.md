@@ -1,0 +1,83 @@
+# Student Result Manager
+
+A Data Structures & Algorithms mini project built around one relatable scenario: managing a class of students and their marks. Every core DSA topic — sorting, searching, stacks, queues, hash maps, recursion, trees, and classic algorithmic patterns — is implemented as a real feature of this system, not an isolated exercise.
+
+No database, no external services. All data lives in memory and resets when you close the program or the page.
+
+## What's in this project
+
+| File | What it is |
+|---|---|
+| `StudentResultManager.java` | Full backend logic in plain Java (JDK 8+), with a scripted console demo of every feature. |
+| `student-result-manager.html` | Interactive, animated front end (HTML/CSS/JS, no build step, no dependencies). |
+| `sort-snake-lab.html` | Standalone prototype of the connected-chain sorting visual (also integrated into the Learn tab above). |
+
+## How to run
+
+### 1. Java console app
+
+```bash
+javac StudentResultManager.java
+java StudentResultManager
+```
+
+Runs a full scripted demo — adds sample students, then runs every sorting algorithm, both searches, all patterns, and prints the results to the console.
+
+### 2. Interactive visualizer
+
+```bash
+python -m http.server 5500
+```
+
+Then open **http://localhost:5500/student-result-manager.html** in your browser.
+
+Use the tab bar to explore each group of features, or press **"▶ Guided Tour"** next to the title to have the whole app demo itself automatically.
+
+- **Overview** — add/delete students, undo, search, kth-highest, live stats, ranked list.
+- **Sorting** — Bubble, Selection, Insertion, and Merge sort, each animated step by step.
+- **Searching** — animated Linear search and Binary search, side by side.
+- **Structures** — Recent-additions Queue, Grade-distribution HashMap, Duplicate-marks HashSet, Binary Search Tree.
+- **Patterns** — Two Sum (hash map pattern), two-pointer Reverse, Sliding Window, Prefix Sum, Recursion (call stack).
+- **Learn** — standalone practice labs (Sorting, Searching, Stack & Queue, Recursion, Hashing) with their own random data, independent of your class list.
+
+A shared **animation speed** control (Slowest–Fastest) is available on the Sorting, Searching, and Structures tabs, and stays in sync across all three.
+
+## DSA concepts covered
+
+**Sorting:** built-in sort, Bubble Sort, Selection Sort, Insertion Sort, Merge Sort
+**Searching:** Linear Search, Binary Search
+**Data structures:** Stack (Undo), Queue (recent additions), HashMap (grade distribution), HashSet (duplicate detection), Binary Search Tree (insert + inorder traversal)
+**Patterns:** Two Sum, two-pointer reversal, sliding window, prefix sum, recursion
+**Supporting logic:** grading (conditional logic), kth-highest, delete
+
+## Running it in VS Code
+
+1. **Install prerequisites** (one-time):
+   - [JDK 8 or newer](https://adoptium.net/) — check with `java -version` in a terminal.
+   - [Python 3](https://www.python.org/downloads/) (only used to serve the HTML file locally) — check with `python --version`.
+   - VS Code extension **Java Extension Pack** (by Microsoft) if you want to run the Java file with a click instead of the terminal.
+
+2. **Open the project folder** in VS Code: `File > Open Folder…` and select this repo's folder.
+
+3. **Run the Java console app:**
+   - Open `StudentResultManager.java`.
+   - With the Java Extension Pack installed, click the **▶ Run** button above the `main` method — VS Code compiles and runs it in the integrated terminal.
+   - Or, without the extension, open a VS Code terminal (`` Ctrl+` ``) and run:
+     ```bash
+     javac StudentResultManager.java
+     java StudentResultManager
+     ```
+
+4. **Run the interactive web app:**
+   - Open a VS Code terminal (`` Ctrl+` ``) in the project folder and run:
+     ```bash
+     python -m http.server 5500
+     ```
+   - Open **http://localhost:5500/student-result-manager.html** in your browser.
+   - (Optional) Install the **Live Server** extension in VS Code and click "Go Live" instead — it does the same job without a manual terminal command.
+
+## Notes
+
+- Works entirely offline once the files are on disk — the visualizer needs only a static file server (no backend, no database).
+- Best viewed with the browser tab focused; heavily backgrounded tabs can pause JavaScript timers mid-animation (normal browser behavior) — just refocus the tab to resume.
+- Both light and dark OS themes are supported automatically.
