@@ -33,21 +33,30 @@ Then open **http://localhost:5500/student-result-manager.html** in your browser.
 
 Use the tab bar to explore each group of features, or press **"▶ Guided Tour"** next to the title to have the whole app demo itself automatically.
 
-- **Overview** — add/delete students, undo, search, kth-highest, live stats, ranked list.
-- **Sorting** — Bubble, Selection, Insertion, and Merge sort, each animated step by step.
+- **Overview** — add/delete students, undo, search (with Trie-powered autocomplete), kth-highest, live stats, ranked list, Save/Load/Clear via local storage.
+- **Sorting** — Bubble, Selection, Insertion, and Merge sort, each animated step by step, plus a side-by-side Algorithm Race.
 - **Searching** — animated Linear search and Binary search, side by side.
-- **Structures** — Recent-additions Queue, Grade-distribution HashMap, Duplicate-marks HashSet, Binary Search Tree.
+- **Structures** — Undo/Redo stack pair, Recent-additions Queue, Grade-distribution HashMap, Duplicate-marks HashSet, Binary Search Tree, Priority Queue / Heap.
 - **Patterns** — Two Sum (hash map pattern), two-pointer Reverse, Sliding Window, Prefix Sum, Recursion (call stack).
-- **Learn** — standalone practice labs (Sorting, Searching, Stack & Queue, Recursion, Hashing) with their own random data, independent of your class list.
+- **Learn** — a catalog of 21 standalone practice labs, each with its own random data independent of your class list, organized into 6 categories:
+  - **Linear Data Structures** — Stack & Queue, Linked List, Circular Queue / Deque, Matrix traversal
+  - **Non-Linear Data Structures** — Trie Tree, AVL Tree, Hashing, LRU Cache, Union-Find (Disjoint Set)
+  - **Searching & Sorting** — Sorting (Quick/Heap/Counting), Searching, Counting Sort
+  - **Graph** — BFS/DFS, Minimum Spanning Tree (Prim's & Kruskal's), Topological Sort (DFS-based & Kahn's)
+  - **Paths** — Shortest Paths (Dijkstra, Bellman-Ford, Floyd-Warshall)
+  - **Algorithm Techniques** — Recursion, Dynamic Programming (Fibonacci, 0/1 Knapsack, LCS), N-Queens (backtracking), Huffman Coding (greedy), Bit Manipulation
 
-A shared **animation speed** control (Slowest–Fastest) is available on the Sorting, Searching, and Structures tabs, and stays in sync across all three.
+A shared **animation speed** control (Slowest–Fastest) is available on the Sorting, Searching, and Structures tabs, and stays in sync across all three. Press **"▶ Guided Tour"** to have the whole app demo itself automatically.
 
 ## DSA concepts covered
 
-**Sorting:** built-in sort, Bubble Sort, Selection Sort, Insertion Sort, Merge Sort
+**Sorting:** built-in sort, Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, Quick Sort, Heap Sort, Counting Sort
 **Searching:** Linear Search, Binary Search
-**Data structures:** Stack (Undo), Queue (recent additions), HashMap (grade distribution), HashSet (duplicate detection), Binary Search Tree (insert + inorder traversal)
-**Patterns:** Two Sum, two-pointer reversal, sliding window, prefix sum, recursion
+**Data structures:** Stack, Queue, HashMap, HashSet, Binary Search Tree, AVL Tree, Trie, Linked List, Circular Queue / Deque, Priority Queue / Heap, LRU Cache
+**Graph algorithms:** BFS, DFS, Dijkstra's shortest path, Bellman-Ford, Floyd-Warshall, Prim's MST, Kruskal's MST, Topological Sort (DFS & Kahn's), Union-Find
+**Dynamic programming:** Fibonacci (memoized vs. plain recursion), 0/1 Knapsack, Longest Common Subsequence
+**Backtracking & greedy:** N-Queens, Huffman Coding
+**Patterns:** Two Sum, two-pointer reversal, sliding window, prefix sum, recursion, bit manipulation
 **Supporting logic:** grading (conditional logic), kth-highest, delete
 
 ## Running it in VS Code
