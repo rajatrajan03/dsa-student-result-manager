@@ -54,24 +54,24 @@
     </div>
     <div id="searchResult"></div>
 
-    <div class="panel toolbar" style="margin-top: 20px;">
+    <div class="panel toolbar mt-20">
       <button class="btn-ghost" id="undoBtn" disabled>&#8630; Undo last action</button>
       <button class="btn-ghost" id="redoBtn" disabled>&#8631; Redo</button>
       <span id="historyHint"></span>
       <div class="divider"></div>
       <div class="kth-group">
-        <label for="kthInput" style="font-family: var(--mono); font-size: 12px; color: var(--text-muted);">Rank #</label>
+        <label for="kthInput" class="mono-label">Rank #</label>
         <input type="number" id="kthInput" min="1" placeholder="2" />
         <button class="btn-ghost" id="kthBtn">Find student</button>
       </div>
       <span id="kthResult"></span>
     </div>
 
-    <div class="panel toolbar" style="margin-top: 12px;">
+    <div class="panel toolbar mt-12">
       <button class="btn-ghost" id="saveBtn">&#128190; Save class</button>
       <button class="btn-ghost" id="loadBtn">&#128194; Load saved</button>
       <button class="btn-ghost" id="clearSavedBtn">&#10005; Clear saved</button>
-      <span id="saveHint" style="font-family: var(--mono); font-size: 12px; color: var(--text-muted);"></span>
+      <span id="saveHint" class="mono-label"></span>
     </div>
 
     <div class="stats">
@@ -113,7 +113,7 @@
       <div class="demo-log" id="bubbleLog"></div>
       <div class="quiz-prompt" id="quizPrompt">
         <p class="quiz-question" id="quizQuestion"></p>
-        <div class="demo-row" style="margin-bottom: 0;">
+        <div class="demo-row mb-0">
           <button id="quizSwapBtn">They swap</button>
           <button class="btn-ghost" id="quizNoSwapBtn">No swap</button>
         </div>
@@ -176,7 +176,7 @@
           <div class="demo-log" id="raceLogB"></div>
         </div>
       </div>
-      <div class="demo-log" id="raceResult" style="margin-top: 10px;"></div>
+      <div class="demo-log mt-10" id="raceResult"></div>
     </div>
   </section>
 
@@ -308,9 +308,9 @@
 
   <!-- ================= LEARN: SORTING LAB ================= -->
   <section class="tab-panel" data-tab-panel="snake" role="tabpanel" id="tabpanel-snake" aria-labelledby="tabbtn-snake">
-    <div class="panel demo-panel" style="margin-bottom: 20px;">
+    <div class="panel demo-panel mb-20">
       <p class="panel-title">Learning labs</p>
-      <p class="panel-hint" style="margin-bottom: 0;">Standalone practice sets, independent of your class list — pick a lab below. Nothing here touches real data.</p>
+      <p class="panel-hint mb-0">Standalone practice sets, independent of your class list — pick a lab below. Nothing here touches real data.</p>
     </div>
 
     <div id="labCatalog"></div>
@@ -320,9 +320,9 @@
       <p class="panel-title">Sorting lab — six algorithms, one connected chain</p>
       <p class="panel-hint">Its own random values on their own connected chain. Pick an algorithm and watch the whole chain slither into sorted order, node by node. Great for learning how each algorithm behaves before you trust it on real data.</p>
 
-      <div class="demo-row" style="margin-bottom: 0;">
-        <span style="font-family: var(--mono); font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:8px;">
-          Values: <input type="range" id="snakeSizeSlider" min="5" max="16" value="10" step="1" style="width:120px;" />
+      <div class="demo-row mb-0">
+        <span class="mono-label-flex8">
+          Values: <input type="range" id="snakeSizeSlider" min="5" max="16" value="10" step="1" class="w-120" />
           <span class="snake-speed-tag" id="snakeSizeTag">10</span>
         </span>
       </div>
@@ -341,15 +341,15 @@
         <span class="snake-desc" id="snakeAlgoDesc">Repeatedly swaps neighboring values that are out of order until the row settles. (O(n&sup2;))</span>
       </div>
 
-      <div class="demo-row" style="margin-top: 12px; align-items: center;">
+      <div class="demo-row mt12-aic">
         <button id="snakePlayBtn">&#9654; Play</button>
         <button class="btn-ghost" id="snakePauseBtn" disabled>&#10073;&#10073; Pause</button>
         <button class="btn-ghost" id="snakeStopBtn" disabled>&#9632; Stop</button>
-        <span style="font-family: var(--mono); font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:8px;">
-          Spd: <input type="range" id="snakeSpeedSlider" min="1" max="5" value="3" step="1" style="width:120px;" />
+        <span class="mono-label-flex8">
+          Spd: <input type="range" id="snakeSpeedSlider" min="1" max="5" value="3" step="1" class="w-120" />
           <span class="snake-speed-tag" id="snakeSpeedTag">Normal</span>
         </span>
-        <button class="btn-ghost" id="snakeShuffleBtn" style="margin-left:auto;">&#8635; New random values</button>
+        <button class="btn-ghost ml-auto" id="snakeShuffleBtn">&#8635; New random values</button>
       </div>
 
       <div class="snake-stats">
@@ -358,12 +358,12 @@
         <span>STEP: <b id="snakeStepCount">0</b></span>
       </div>
 
-      <div class="demo-log" id="snakeStatusLine" style="margin: 10px 0 4px;">Pick an algorithm, then press Play.</div>
+      <div class="demo-log m-10-0-4" id="snakeStatusLine">Pick an algorithm, then press Play.</div>
 
       <div class="snake-stage" id="snakeStage">
         <svg id="snakeSpineSvg"><polyline class="snake-spine" id="snakeSpinePath" points=""/></svg>
       </div>
-      <p class="panel-hint" style="margin: 10px 0 0;">This is a self-contained practice set — it has no connection to your class list and doesn't change any real data.</p>
+      <p class="panel-hint m-10-0-0">This is a self-contained practice set — it has no connection to your class list and doesn't change any real data.</p>
     </div>
     </div>
 
@@ -372,20 +372,20 @@
       <p class="panel-title">Searching lab — linear vs. binary</p>
       <p class="panel-hint">A sorted, independent set of values. Run linear search (checks one by one) or binary search (halves the range each step) for the same target and compare how many checks each one takes.</p>
 
-      <div class="demo-row" style="margin-bottom: 0;">
-        <input type="number" id="searchLabTarget" placeholder="Value to find" style="max-width: 160px;" />
+      <div class="demo-row mb-0">
+        <input type="number" id="searchLabTarget" placeholder="Value to find" class="max-w-160" />
         <button id="searchLabLinearBtn">Run linear search</button>
         <button id="searchLabBinaryBtn">Run binary search</button>
-        <button class="btn-ghost" id="searchLabShuffleBtn" style="margin-left:auto;">&#8635; New values</button>
+        <button class="btn-ghost ml-auto" id="searchLabShuffleBtn">&#8635; New values</button>
       </div>
 
       <div class="snake-stats">
         <span>CHECKS: <b id="searchLabChecks">0</b></span>
       </div>
 
-      <div class="demo-log" id="searchLabStatus" style="margin: 10px 0 4px;">Pick a value, then run a search.</div>
+      <div class="demo-log m-10-0-4" id="searchLabStatus">Pick a value, then run a search.</div>
 
-      <div class="cellgrid" id="searchLabArray" style="margin-top: 14px;"></div>
+      <div class="cellgrid mt-14" id="searchLabArray"></div>
     </div>
     </div>
 
@@ -394,25 +394,25 @@
       <p class="panel-title">Stack &amp; Queue lab — LIFO vs. FIFO, side by side</p>
       <p class="panel-hint">A Stack only lets you add/remove from the top (Last In, First Out). A Queue only lets you add at the back and remove from the front (First In, First Out). Push and enqueue the same numbers here and see the order they come back out in.</p>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div class="two-col-grid">
         <div>
-          <p class="panel-title" style="margin-bottom: 8px;">Stack (LIFO)</p>
-          <div class="demo-row" style="margin-bottom: 10px;">
+          <p class="panel-title mb-8">Stack (LIFO)</p>
+          <div class="demo-row mb-10">
             <button id="stackPushBtn">&#8593; Push</button>
             <button class="btn-ghost" id="stackPopBtn">&#8595; Pop</button>
           </div>
           <div class="sq-stack-well" id="stackWell"></div>
         </div>
         <div>
-          <p class="panel-title" style="margin-bottom: 8px;">Queue (FIFO)</p>
-          <div class="demo-row" style="margin-bottom: 10px;">
+          <p class="panel-title mb-8">Queue (FIFO)</p>
+          <div class="demo-row mb-10">
             <button id="queuePushBtn">&#8594; Enqueue</button>
             <button class="btn-ghost" id="queuePopBtn">&#8592; Dequeue</button>
           </div>
           <div class="sq-queue-well" id="queueWell"></div>
         </div>
       </div>
-      <div class="demo-log" id="sqStatus" style="margin-top: 12px;">Push/enqueue a few values, then pop/dequeue to see the order.</div>
+      <div class="demo-log mt-12" id="sqStatus">Push/enqueue a few values, then pop/dequeue to see the order.</div>
     </div>
     </div>
 
@@ -421,12 +421,12 @@
       <p class="panel-title">Recursion lab — factorial via the call stack</p>
       <p class="panel-hint">factorial(n) calls factorial(n&minus;1) until it hits the base case factorial(0)=1, then each call multiplies as it returns. Watch the call stack grow going down and unwind coming back up.</p>
 
-      <div class="demo-row" style="margin-bottom: 0;">
-        <input type="number" id="recurLabInput" placeholder="n, e.g. 5" min="0" max="10" style="max-width: 140px;" />
+      <div class="demo-row mb-0">
+        <input type="number" id="recurLabInput" placeholder="n, e.g. 5" min="0" max="10" class="max-w-140" />
         <button id="recurLabBtn">Run factorial(n)</button>
       </div>
 
-      <div class="demo-log" id="recurLabStatus" style="margin: 12px 0 8px;">Pick a value from 0&ndash;10, then run it.</div>
+      <div class="demo-log m-12-0-8" id="recurLabStatus">Pick a value from 0&ndash;10, then run it.</div>
       <div class="stack-frames" id="recurLabFrames"></div>
     </div>
     </div>
@@ -442,7 +442,7 @@
         <button class="btn-ghost" id="hashLabResetBtn">&#8635; Clear table</button>
       </div>
 
-      <div class="demo-log" id="hashLabLog" style="margin: 10px 0 14px;">Type a word and insert it to see which bucket it lands in.</div>
+      <div class="demo-log m-10-0-14" id="hashLabLog">Type a word and insert it to see which bucket it lands in.</div>
 
       <div class="hash-buckets" id="hashBuckets"></div>
     </div>
@@ -454,7 +454,7 @@
       <p class="panel-hint">A small fixed graph of 8 nodes. Breadth-First Search explores level by level using a Queue; Depth-First Search plunges down one path at a time using a Stack (or recursion). Run both from the same start node and compare the visiting order.</p>
 
       <div class="demo-row">
-        <label style="font-family: var(--mono); font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:6px;">
+        <label class="mono-label-flex6">
           Start: <select id="graphStartSelect" class="race-select"></select>
         </label>
         <button id="graphBfsBtn">Run BFS</button>
@@ -464,12 +464,12 @@
       <div class="bst-svg-wrap"><svg id="graphSvg" width="100%" height="320"></svg></div>
       <div class="demo-log" id="graphLog"></div>
 
-      <p class="panel-hint" style="margin-top: 16px;">Every edge here also has a weight (shown on the line). <b>Dijkstra's algorithm</b> finds the cheapest path between two nodes — not just any path — by always expanding the closest unvisited node next.</p>
+      <p class="panel-hint mt-16">Every edge here also has a weight (shown on the line). <b>Dijkstra's algorithm</b> finds the cheapest path between two nodes — not just any path — by always expanding the closest unvisited node next.</p>
       <div class="demo-row">
-        <label style="font-family: var(--mono); font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:6px;">
+        <label class="mono-label-flex6">
           From: <select id="dijkstraFromSelect" class="race-select"></select>
         </label>
-        <label style="font-family: var(--mono); font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:6px;">
+        <label class="mono-label-flex6">
           To: <select id="dijkstraToSelect" class="race-select"></select>
         </label>
         <button id="dijkstraBtn">Find shortest path</button>
@@ -483,7 +483,7 @@
       <p class="panel-title">Linked list lab — nodes and pointers</p>
       <p class="panel-hint">Unlike an array, a linked list doesn't sit in one contiguous block — each node just holds a value and a pointer to the next node. Inserting at the head is O(1) because nothing has to shift; reaching the tail (or any middle node) still costs O(n) because you have to follow the pointers one by one.</p>
       <div class="demo-row">
-        <input type="number" id="llValueInput" placeholder="Value, e.g. 42" style="max-width: 140px;" />
+        <input type="number" id="llValueInput" placeholder="Value, e.g. 42" class="max-w-140" />
         <button id="llInsertHeadBtn">Insert at head</button>
         <button id="llInsertTailBtn">Insert at tail</button>
         <button class="btn-ghost" id="llDeleteBtn">Delete value</button>
@@ -499,7 +499,7 @@
       <p class="panel-title">Dynamic programming lab — memoized vs. plain recursion</p>
       <p class="panel-hint">Plain recursive Fibonacci recomputes the same values over and over — fib(30) makes over a million calls. Memoized (DP) Fibonacci stores each result the first time it's computed and reuses it — the classic trade of a little memory for a huge amount of time.</p>
       <div class="demo-row">
-        <input type="number" id="dpInput" placeholder="n, e.g. 30" min="1" max="38" style="max-width: 140px;" />
+        <input type="number" id="dpInput" placeholder="n, e.g. 30" min="1" max="38" class="max-w-140" />
         <button id="dpRunBtn">Race plain vs. memoized</button>
       </div>
       <div class="demo-log" id="dpLog"></div>
@@ -526,7 +526,7 @@
       <p class="panel-title">N-Queens lab — backtracking</p>
       <p class="panel-hint">Place queens one column at a time so none attack each other. Whenever a queen has nowhere safe to go, backtracking removes ("un-places") the previous queen and tries her in a different row — the core idea behind every backtracking algorithm.</p>
       <div class="demo-row">
-        <label style="font-family: var(--mono); font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:6px;">
+        <label class="mono-label-flex6">
           Board size: <select id="nqueensSizeSelect" class="race-select">
             <option value="4">4 × 4</option>
             <option value="5" selected>5 × 5</option>
@@ -545,14 +545,14 @@
       <p class="panel-title">LRU cache lab — HashMap + doubly linked list</p>
       <p class="panel-hint">A fixed-size cache: a HashMap gives instant O(1) lookup by key, while a doubly linked list keeps every key ordered by how recently it was used. Getting or putting a key moves it to the front. When the cache is full, whatever sits at the back — untouched the longest — gets evicted.</p>
       <div class="demo-row">
-        <label style="font-family: var(--mono); font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:6px;">
-          Capacity: <input type="number" id="lruCapacityInput" value="3" min="2" max="6" style="width:60px;" />
+        <label class="mono-label-flex6">
+          Capacity: <input type="number" id="lruCapacityInput" value="3" min="2" max="6" class="w-60" />
         </label>
         <button class="btn-ghost" id="lruResetBtn">Reset cache</button>
       </div>
       <div class="demo-row">
-        <input type="number" id="lruKeyInput" placeholder="Key" style="max-width: 100px;" />
-        <input type="number" id="lruValueInput" placeholder="Value" style="max-width: 100px;" />
+        <input type="number" id="lruKeyInput" placeholder="Key" class="max-w-100" />
+        <input type="number" id="lruValueInput" placeholder="Value" class="max-w-100" />
         <button id="lruPutBtn">Put</button>
         <button class="btn-ghost" id="lruGetBtn">Get</button>
       </div>
@@ -586,7 +586,7 @@
       <p class="panel-title">Matrix lab — spiral traversal of a 2D array</p>
       <p class="panel-hint">A matrix is just an array of arrays. Spiral traversal visits every cell by shrinking the boundary inward — right along the top, down the right side, left along the bottom, up the left side, then repeat — a classic 2D-array walking pattern.</p>
       <div class="demo-row"><button id="matrixBtn">Run spiral traversal</button></div>
-      <div class="nqueens-board" id="matrixBoard" style="grid-template-columns: repeat(5, auto);"></div>
+      <div class="nqueens-board grid-cols-5" id="matrixBoard"></div>
       <div class="demo-log" id="matrixLog"></div>
     </div>
     </div>
@@ -600,7 +600,7 @@
         <button class="btn-ghost" id="cqDequeueBtn">Dequeue (front)</button>
         <button class="btn-ghost" id="cqFrontBtn">Push front (deque)</button>
       </div>
-      <div class="nqueens-board" id="cqBoard" style="grid-template-columns: repeat(6, auto);"></div>
+      <div class="nqueens-board grid-cols-6" id="cqBoard"></div>
       <div class="demo-log" id="cqLog">Fixed-size circular buffer (6 slots) — front/rear wrap around.</div>
     </div>
     </div>
@@ -610,7 +610,7 @@
       <p class="panel-title">AVL tree lab — a self-balancing BST</p>
       <p class="panel-hint">A plain BST can degrade into a straight line (O(n) lookups) if values arrive in sorted order — try inserting 1,2,3,4,5 here and watch. An AVL tree fixes this automatically: after every insert, it checks each node's balance and <b>rotates</b> subtrees back into shape, guaranteeing O(log n) height.</p>
       <div class="demo-row">
-        <input type="number" id="avlValueInput" placeholder="Value, e.g. 30" style="max-width: 140px;" />
+        <input type="number" id="avlValueInput" placeholder="Value, e.g. 30" class="max-w-140" />
         <button id="avlInsertBtn">Insert</button>
         <button class="btn-ghost" id="avlResetBtn">&#8635; Reset tree</button>
       </div>
@@ -674,13 +674,13 @@
       <p class="panel-title">Bit manipulation lab</p>
       <p class="panel-hint">Numbers are just bits under the hood — these tricks work directly on them instead of treating them as decimal values, which is often much faster: counting set bits, checking powers of two, and swapping two values with no temporary variable.</p>
       <div class="demo-row">
-        <input type="number" id="bitInputA" placeholder="Value, e.g. 42" style="max-width: 140px;" />
+        <input type="number" id="bitInputA" placeholder="Value, e.g. 42" class="max-w-140" />
         <button id="bitCountBtn">Count set bits</button>
         <button id="bitPow2Btn">Is power of 2?</button>
       </div>
       <div class="demo-row">
-        <input type="number" id="bitSwapA" placeholder="A, e.g. 5" style="max-width: 110px;" />
-        <input type="number" id="bitSwapB" placeholder="B, e.g. 9" style="max-width: 110px;" />
+        <input type="number" id="bitSwapA" placeholder="A, e.g. 5" class="max-w-110" />
+        <input type="number" id="bitSwapB" placeholder="B, e.g. 9" class="max-w-110" />
         <button id="bitSwapBtn">XOR swap (no temp var)</button>
       </div>
       <div class="demo-log" id="bitmanipLog"></div>

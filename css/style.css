@@ -529,6 +529,35 @@
   }
   .footer-note { font-size: 12.5px; color: var(--text-faint); line-height: 1.6; margin: 16px 0 0; }
 
+  /* --- layout utility classes (formerly inline styles) --- */
+  .mt-10 { margin-top: 10px; }
+  .mt-12 { margin-top: 12px; }
+  .mt-14 { margin-top: 14px; }
+  .mt-16 { margin-top: 16px; }
+  .mt-20 { margin-top: 20px; }
+  .mt12-aic { margin-top: 12px; align-items: center; }
+  .mb-0 { margin-bottom: 0; }
+  .mb-8 { margin-bottom: 8px; }
+  .mb-10 { margin-bottom: 10px; }
+  .mb-20 { margin-bottom: 20px; }
+  .ml-auto { margin-left: auto; }
+  .m-10-0-4 { margin: 10px 0 4px; }
+  .m-10-0-0 { margin: 10px 0 0; }
+  .m-12-0-8 { margin: 12px 0 8px; }
+  .m-10-0-14 { margin: 10px 0 14px; }
+  .w-60 { width: 60px !important; min-width: 60px !important; }
+  .w-120 { width: 120px !important; }
+  .max-w-100 { max-width: 100px !important; min-width: 0 !important; }
+  .max-w-110 { max-width: 110px !important; min-width: 0 !important; }
+  .max-w-140 { max-width: 140px !important; }
+  .max-w-160 { max-width: 160px !important; }
+  .two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-cols-5 { grid-template-columns: repeat(5, auto); }
+  .grid-cols-6 { grid-template-columns: repeat(6, auto); }
+  .mono-label { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+  .mono-label-flex6 { font-family: var(--mono); font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+  .mono-label-flex8 { font-family: var(--mono); font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+
   @media (max-width: 560px) {
     .add-panel { grid-template-columns: 1fr 1fr; }
     .add-panel button { grid-column: 1 / -1; }
