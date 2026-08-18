@@ -12,7 +12,8 @@ No database, no external services. All data lives in memory and resets when you 
 | `student-result-manager.html` | Interactive, animated front end markup (no build step, no dependencies). |
 | `css/style.css` | All styling — glassmorphism theme, layout, animations. |
 | `js/script.js` | All application logic — every DSA feature and lab. |
-| `sort-snake-lab.html` | Standalone prototype of the connected-chain sorting visual (also integrated into the Learn tab above). |
+| `sort-snake-lab.html` | Standalone prototype of the connected-chain sorting visual (also integrated into the Learn tab above); markup only, styled by `css/sort-snake-lab.css` and driven by `js/sort-snake-lab.js`. |
+| `index.html` | Redirects to `student-result-manager.html` (used by the Render deployment's root URL). |
 
 ## How to run
 
