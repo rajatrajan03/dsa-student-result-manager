@@ -9,7 +9,9 @@ No database, no external services. All data lives in memory and resets when you 
 | File | What it is |
 |---|---|
 | `StudentResultManager.java` | Full backend logic in plain Java (JDK 8+), with a scripted console demo of every feature. |
-| `student-result-manager.html` | Interactive, animated front end (HTML/CSS/JS, no build step, no dependencies). |
+| `student-result-manager.html` | Interactive, animated front end markup (no build step, no dependencies). |
+| `css/style.css` | All styling — glassmorphism theme, layout, animations. |
+| `js/script.js` | All application logic — every DSA feature and lab. |
 | `sort-snake-lab.html` | Standalone prototype of the connected-chain sorting visual (also integrated into the Learn tab above). |
 
 ## How to run
