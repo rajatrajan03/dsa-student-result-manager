@@ -14,6 +14,8 @@ No database, no external services. All data lives in memory and resets when you 
 | `js/script.js` | All application logic — every DSA feature and lab. |
 | `sort-snake-lab.html` | Standalone prototype of the connected-chain sorting visual (also integrated into the Learn tab above); markup only, styled by `css/sort-snake-lab.css` and driven by `js/sort-snake-lab.js`. |
 | `index.html` | Redirects to `student-result-manager.html` (used by the Render deployment's root URL). |
+| `js/alpine-tips.js` | Registers the "DSA Tip" carousel component (see below) with Alpine.js. |
+| `js/vendor/alpine.min.js` | [Alpine.js](https://alpinejs.dev/) v3, vendored locally so the app still runs fully offline. |
 
 ## How to run
 
@@ -50,6 +52,8 @@ Use the tab bar to explore each group of features, or press **"▶ Guided Tour"*
   - **Algorithm Techniques** — Recursion, Dynamic Programming (Fibonacci, 0/1 Knapsack, LCS), N-Queens (backtracking), Huffman Coding (greedy), Bit Manipulation
 
 A shared **animation speed** control (Slowest–Fastest) is available on the Sorting, Searching, and Structures tabs, and stays in sync across all three. Press **"▶ Guided Tour"** to have the whole app demo itself automatically.
+
+A small **"DSA Tip" carousel** sits just below the header, cycling through short facts (Binary Search, Stack vs. Queue, HashMap lookups, etc.) with Prev/Next controls. It's built with **[Alpine.js](https://alpinejs.dev/)** — a lightweight, no-build-step reactive framework — kept in its own file (`js/alpine-tips.js`) completely separate from the rest of the app's plain JavaScript, so it doesn't touch or depend on any existing logic.
 
 ## DSA concepts covered
 

@@ -99,6 +99,25 @@
   }
   .theme-toggle-btn:hover { color: var(--accent); border-color: var(--accent); }
 
+  [x-cloak] { display: none !important; }
+
+  .tip-widget {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+    margin-bottom: 16px; padding: 11px 16px; border-radius: var(--radius);
+    background: var(--surface-2); border: 1px solid var(--border);
+    backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  }
+  .tip-widget-head { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+  .tip-widget-tag {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 9px;
+  }
+  .tip-widget-title { font-weight: 600; font-size: 13.5px; }
+  .tip-widget-text { flex: 1 1 260px; min-width: 0; font-size: 13px; color: var(--text-muted); margin: 0; }
+  .tip-widget-nav { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+  .tip-widget-nav button { padding: 4px 10px; }
+  .tip-widget-count { font-family: var(--mono); font-size: 11.5px; color: var(--text-faint); min-width: 34px; text-align: center; }
+
   .tour-banner {
     display: none; align-items: center; gap: 10px; margin-bottom: 16px;
     padding: 11px 16px; border-radius: var(--radius); background: var(--accent-soft);

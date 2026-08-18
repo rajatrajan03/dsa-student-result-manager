@@ -15,6 +15,19 @@
     <p class="sub">A student record system where every operation — sorting, searching, undo, ranking — is a real DSA concept you can watch run, step by step. All data lives in memory, no database.</p>
   </header>
 
+  <div class="tip-widget" x-data="tipCarousel()" x-cloak>
+    <div class="tip-widget-head">
+      <span class="tip-widget-tag">DSA Tip</span>
+      <span class="tip-widget-title" x-text="current.title"></span>
+    </div>
+    <p class="tip-widget-text" x-text="current.text"></p>
+    <div class="tip-widget-nav">
+      <button class="btn-ghost" @click="prev()" aria-label="Previous tip">&#8592;</button>
+      <span class="tip-widget-count" x-text="(index + 1) + ' / ' + tips.length"></span>
+      <button class="btn-ghost" @click="next()" aria-label="Next tip">&#8594;</button>
+    </div>
+  </div>
+
   <div class="tour-banner" id="tourBanner">
     <span class="tour-banner-dot"></span>
     <span class="tour-banner-text" id="tourBannerText">Starting tour…</span>
@@ -714,3 +727,5 @@
 </div>
 
 <script src="js/script.js"></script>
+<script defer src="js/alpine-tips.js"></script>
+<script defer src="js/vendor/alpine.min.js"></script>
